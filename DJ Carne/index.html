@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Альбом</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #1c1610;
+    --panel: #271e15;
+    --panel-2: #322617;
+    --amber: #d9a13c;
+    --rust: #c2502b;
+    --cream: #f1e6d3;
+    --muted: #8d7c64;
+    --line: #3a2e1e;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(217,161,60,0.07), transparent 40%),
+      radial-gradient(circle at 85% 92%, rgba(194,80,43,0.08), transparent 45%);
+    color: var(--cream);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    display:flex;
+    justify-content:center;
+    padding: 32px 16px 60px;
+  }
+  .hidden{ display:none !important; }
+  .wrap{ width:100%; max-width: 640px; }
+
+  /* ---- ВХОДНОЙ ЭКРАН Lite / Pro+ ---- */
+  .entry-overlay{
+    position: fixed; inset: 0;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(217,161,60,0.09), transparent 40%),
+      radial-gradient(circle at 85% 92%, rgba(194,80,43,0.1), transparent 45%);
+    display:flex;
+    align-items:center; justify-content:center;
+    padding: 20px;
+    z-index: 300;
+  }
+  .entry-card{
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+  }
+  .entry-logo{ font-size: 38px; margin-bottom: 6px; }
+  .entry-h1{
+    font-family:'Bebas Neue', sans-serif;
+    font-size: 46px;
+    letter-spacing: 0.04em;
+    color: var(--cream);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .entry-sub{
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 26px;
+    line-height: 1.6;
+  }
+  .entry-buttons{ display:flex; flex-direction:column; gap: 12px; }
+  .entry-btn{
+    display:flex;
+    flex-direction: column;
+    align-items:center;
+    gap: 3px;
+    padding: 18px;
+    border-radius: 16px;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    transition: transform .12s ease, border-color .15s ease;
+  }
+  .entry-btn:hover{ border-color: rgba(217,161,60,0.5); transform: translateY(-1px); }
+  .entry-btn:active{ transform: scale(0.98); }
+  .entry-btn-title{
+    font-family:'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.04em;
+    color: var(--cream);
+  }
+  .entry-btn-desc{ font-size: 12px; color: var(--muted); }
+  .entry-btn-pro{ border-color: rgba(217,161,60,0.35); background: linear-gradient(165deg, var(--panel-2), var(--panel)); }
+  .entry-btn-pro .entry-btn-title{ color: var(--amber); }
+  .entry-password-block{ margin-top: 14px; }
+  .entry-password-block .gate-input{ margin-bottom: 10px; }
+
+  .gate-input{
+    width: 100%;
+    background: #15100b;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--cream);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    letter-spacing: 0.08em;
+    text-align: center;
+    padding: 13px 14px;
+    outline: none;
+  }
+  .gate-input:focus{ border-color: var(--amber); }
+  .gate-btn{
+    width: 100%;
+    background: var(--amber);
+    border: 1px solid var(--amber);
+    color: #1c1610;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  .gate-btn:hover{ background:#e6b25a; }
+  .gate-error{
+    font-size: 12px;
+    color: var(--rust);
+    min-height: 16px;
+    margin-bottom: 6px;
+  }
+  .gate-back{
+    background:none; border:none; cursor:pointer;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .gate-back:hover{ color: var(--cream); }
+
+  /* ---- MODE BADGE ---- */
+  .mode-row{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .mode-badge{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    padding: 6px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--muted);
+  }
+  .mode-badge.pro{ color: var(--amber); border-color: rgba(217,161,60,0.5); background: rgba(217,161,60,0.1); }
+  .mode-upgrade{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--amber);
+    background: none;
+    border: 1px solid rgba(217,161,60,0.4);
+    border-radius: 10px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+  .mode-upgrade:hover{ background: rgba(217,161,60,0.1); }
+
+  /* ---- ВКЛАДКИ АЛЬБОМОВ (SPA, без перезагрузки) ---- */
+  .albumnav{
+    display:flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .albumnav button{
+    flex:1;
+    min-width: 110px;
+    text-align:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 8px;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .albumnav button:hover{ border-color: rgba(217,161,60,0.4); color: var(--cream); }
+  .albumnav button.current{
+    color: var(--amber);
+    border-color: rgba(217,161,60,0.5);
+    background: rgba(217,161,60,0.1);
+  }
+
+  /* ---- HEADER / CASSETTE ---- */
+  .deck{
+    background: linear-gradient(165deg, var(--panel-2), var(--panel));
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 26px 26px 22px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 30px 60px -30px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.03);
+  }
+  .deck::before{
+    content:"";
+    position:absolute; inset:0;
+    background: repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 6px);
+    pointer-events:none;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display:flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  h1{
+    font-family:'Bebas Neue', sans-serif;
+    font-size: 44px;
+    letter-spacing: 0.04em;
+    margin: 0;
+    color: var(--cream);
+    line-height: 1;
+  }
+  .artists{ font-size: 13px; font-weight: 500; color: var(--amber); margin: 6px 0 4px; }
+  .artists b{ color: var(--cream); font-weight:600; }
+  .tagline{ font-size: 12.5px; color: var(--muted); margin: 0 0 18px; }
+  .reels{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    background: #15100b;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 22px;
+    position: relative;
+  }
+  .reel{
+    width: 58px; height: 58px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at center, #0e0a06 0 9px, transparent 9.5px),
+      conic-gradient(from 0deg, #4a3a23 0 10deg, #2a2015 10deg 20deg);
+    border: 3px solid #4a3a23;
+    position: relative;
+    animation: spin 3.2s linear infinite;
+    animation-play-state: paused;
+  }
+  .reel::after{
+    content:"";
+    position:absolute; inset:0;
+    border-radius:50%;
+    background: radial-gradient(circle at center, transparent 0 13px, rgba(0,0,0,0.35) 13.5px 100%);
+  }
+  .playing .reel{ animation-play-state: running; }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+  .tape-window{ flex:1; margin: 0 18px; text-align:center; min-width:0; }
+  .now-title{ font-weight:600; font-size: 15px; white-space: nowrap; overflow:hidden; text-overflow: ellipsis; }
+  .now-sub{ font-family:'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 4px; letter-spacing: 0.05em; }
+  .counter{ font-family:'JetBrains Mono', monospace; font-size: 11px; color: var(--amber); letter-spacing: 0.1em; }
+
+  /* ---- TRANSPORT ---- */
+  .transport{ display:flex; align-items:center; gap: 12px; margin-top: 18px; }
+  button.ctrl{
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    color: var(--cream);
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+    cursor: pointer;
+    transition: transform .12s ease, background .15s ease, border-color .15s ease;
+  }
+  button.ctrl:hover{ background:#3a2c1a; border-color:#5a4527; }
+  button.ctrl:active{ transform: scale(0.92); }
+  button.ctrl svg{ width:16px; height:16px; fill: var(--cream); }
+  #playBtn{ width: 56px; height: 56px; background: var(--amber); border-color: var(--amber); }
+  #playBtn svg{ fill: #1c1610; width:20px; height:20px; }
+  #playBtn:hover{ background:#e6b25a; }
+  .seek-area{ flex:1; display:flex; flex-direction: column; gap: 6px; }
+  .seek-row{ display:flex; align-items:center; gap: 8px; font-family:'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+  input[type=range]{ -webkit-appearance: none; width: 100%; height: 4px; border-radius: 2px; background: var(--line); outline: none; }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width: 12px; height:12px; border-radius:50%;
+    background: var(--amber); cursor:pointer; box-shadow: 0 0 0 3px rgba(217,161,60,0.18);
+  }
+  #progress{ flex:1; }
+  .vol-row{ display:flex; align-items:center; gap:8px; margin-top: 14px; }
+  #volume{ width: 90px; }
+  .vol-row svg{ width:14px; height:14px; fill: var(--muted); flex-shrink:0; }
+
+  /* ---- ПОИСК И ФИЛЬТРЫ ---- */
+  .toolbar{ display:flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+  .search-box{
+    flex: 1; min-width: 180px; display:flex; align-items:center; gap: 10px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 11px 14px; transition: border-color .15s ease;
+  }
+  .search-box:focus-within{ border-color: var(--amber); }
+  .search-box svg{ width:16px; height:16px; fill: var(--muted); flex-shrink:0; }
+  .search-box input{ flex:1; background: none; border: none; outline: none; color: var(--cream); font-family: 'Inter', sans-serif; font-size: 14px; }
+  .search-box input::placeholder{ color: var(--muted); }
+  .search-clear{ background:none; border:none; cursor:pointer; color: var(--muted); font-size: 16px; line-height:1; padding: 0 2px; display:none; }
+  .search-clear.show{ display:block; }
+  .chip{
+    font-family:'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.03em;
+    color: var(--muted); background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 11px 16px; cursor: pointer;
+    display:flex; align-items:center; gap:6px; transition: all .15s ease; white-space: nowrap;
+  }
+  .chip svg{ width:13px; height:13px; fill: var(--muted); transition: fill .15s ease; }
+  .chip.active{ color: var(--amber); border-color: rgba(217,161,60,0.5); background: rgba(217,161,60,0.1); }
+  .chip.active svg{ fill: var(--rust); }
+
+  /* ---- TRACKLIST ---- */
+  .tracklist{ margin-top: 28px; }
+  .tl-head{ display:flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; padding: 0 6px; }
+  .tl-head h2{ font-family:'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.05em; margin:0; color: var(--cream); }
+  .tl-head span{ font-family:'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+  ul.tracks{ list-style:none; margin:0; padding:0; border-top: 1px solid var(--line); }
+  .track{
+    display:flex; align-items:center; gap: 16px; padding: 20px 14px;
+    border-bottom: 1px solid var(--line); cursor:pointer;
+    transition: background .12s ease, padding-left .12s ease; border-radius: 10px;
+  }
+  .track:hover{ background: rgba(217,161,60,0.06); padding-left: 18px; }
+  .track.active{ background: rgba(217,161,60,0.12); }
+  .tnum{
+    font-family:'JetBrains Mono', monospace; font-size: 22px; font-weight: 700;
+    color: var(--muted); width: 42px; text-align:right; flex-shrink:0; opacity: 0.55;
+  }
+  .track.active .tnum{ color: var(--amber); opacity:1; }
+  .tinfo{ flex:1; min-width: 0; display:flex; flex-direction: column; gap: 4px; }
+  .ttitle{ font-size: 18px; font-weight: 600; line-height: 1.25; min-width: 0; overflow:hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .track.active .ttitle{ color: var(--amber); }
+  .tsub{ font-family:'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .track.active .tsub{ color: rgba(217,161,60,0.7); }
+  .tdur{ font-family:'JetBrains Mono', monospace; font-size: 13px; color: var(--muted); flex-shrink:0; width: 44px; text-align:right; }
+  .track.active .tdur{ color: var(--amber); }
+  .icon-btn{
+    width: 30px; height: 30px; flex-shrink:0; border: none; background: rgba(255,255,255,0.03);
+    border-radius: 50%; display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition: background .15s ease, transform .12s ease;
+  }
+  .icon-btn:active{ transform: scale(0.85); }
+  .icon-btn svg{ width:14px; height:14px; fill: none; stroke: var(--muted); stroke-width: 2px; transition: fill .15s ease, stroke .15s ease; }
+  .heart-btn:hover{ background: rgba(194,80,43,0.18); }
+  .heart-btn.liked{ background: rgba(194,80,43,0.18); }
+  .heart-btn.liked svg{ fill: var(--rust); stroke: var(--rust); }
+  .tplay{
+    width: 30px; height: 30px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    background: rgba(255,255,255,0.03); border-radius: 50%;
+  }
+  .track.active .tplay{ background: rgba(217,161,60,0.16); }
+  .tplay svg{ width:13px; height:13px; fill: var(--muted); }
+  .track.active .tplay svg{ fill: var(--amber); }
+  .eq{ display:flex; align-items:flex-end; gap:2px; width:13px; height:13px; }
+  .eq span{ width:2.5px; background: var(--amber); display:block; animation: eq 0.9s ease-in-out infinite; }
+  .eq span:nth-child(1){ height:40%; animation-delay: -0.6s; }
+  .eq span:nth-child(2){ height:100%; animation-delay: -0.3s; }
+  .eq span:nth-child(3){ height:65%; animation-delay: -0.9s; }
+  @keyframes eq{ 0%,100%{ transform: scaleY(0.4); } 50%{ transform: scaleY(1); } }
+
+  .now-badge{
+    display:inline-flex; align-items:center; gap: 4px;
+    font-family:'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--amber); background: rgba(217,161,60,0.14);
+    border-radius: 6px; padding: 2px 6px; margin-left: 8px; vertical-align: middle;
+  }
+  .now-badge .dot{ width:5px; height:5px; border-radius:50%; background: var(--amber); animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:0.3; } }
+
+  .pro-badge{
+    display:inline-flex; align-items:center; gap: 3px;
+    font-family:'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--rust); background: rgba(194,80,43,0.16);
+    border-radius: 6px; padding: 2px 6px; margin-left: 8px; vertical-align: middle;
+  }
+
+  .empty-state{ text-align:center; padding: 40px 20px; color: var(--muted); }
+  .empty-state .ee{ font-size: 30px; margin-bottom: 10px; }
+  .empty-state p{ margin: 0; font-size: 13.5px; line-height:1.6; }
+  .empty-state b{ color: var(--cream); }
+
+  @media (max-width: 480px){
+    h1{ font-size: 34px; }
+    .reels{ padding: 14px 14px; }
+    .reel{ width:46px; height:46px; }
+    .tape-window{ margin: 0 10px; }
+    .toolbar{ flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== ВХОДНОЙ ЭКРАН: Lite / Pro+ ===== -->
+<div class="entry-overlay" id="entryGate">
+  <div class="entry-card">
+    <div class="entry-logo">🎧</div>
+    <div class="entry-h1">АЛЬБОМ</div>
+    <div class="entry-sub">DJ Мясо × DJ Путария<br>Выбери, с какой версии начать</div>
+
+    <div class="entry-buttons" id="entryButtons">
+      <button class="entry-btn entry-btn-lite" id="enterLiteBtn">
+        <span class="entry-btn-title">Lite</span>
+        <span class="entry-btn-desc" id="liteBtnDesc">Бесплатные треки</span>
+      </button>
+      <button class="entry-btn entry-btn-pro" id="enterProBtn">
+        <span class="entry-btn-title">✨ Pro+</span>
+        <span class="entry-btn-desc" id="proBtnDesc">Все треки, нужен код</span>
+      </button>
+    </div>
+
+    <div class="entry-password-block hidden" id="entryPasswordBlock">
+      <input type="password" inputmode="numeric" class="gate-input" id="entryPasswordInput" placeholder="Код Pro+" autocomplete="off">
+      <button class="gate-btn" id="entryPasswordSubmit">Активировать</button>
+      <div class="gate-error" id="entryPasswordError"></div>
+      <button class="gate-back" id="entryPasswordBack">← Назад к выбору</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ОСНОВНОЕ ПРИЛОЖЕНИЕ ===== -->
+<div class="wrap hidden" id="app">
+
+  <div class="mode-row">
+    <span class="mode-badge" id="modeBadge">LITE</span>
+    <button class="mode-upgrade hidden" id="modeUpgradeBtn">✨ Открыть Pro+</button>
+  </div>
+
+  <div class="albumnav" id="albumNav">
+    <button data-album="all" class="current">Все песни</button>
+    <button data-album="old-money">Old Money</button>
+    <button data-album="putaria-best">PutariaBest</button>
+    <button data-album="chanson">Шансон лучшее</button>
+  </div>
+
+  <div class="deck" id="deck">
+    <div class="eyebrow"><span id="sideLabel">СТОРОНА A</span><span class="counter" id="counter">01/00</span></div>
+    <h1 id="albumH1">ВСЕ ПЕСНИ</h1>
+    <div class="artists">Альбом <b id="albumLabel">Все песни</b></div>
+    <div class="tagline">Привет! 🎧 Ищи трек, лайкай любимые — плеер не прерывается при смене вкладки.</div>
+
+    <div class="reels">
+      <div class="reel"></div>
+      <div class="tape-window">
+        <div class="now-title" id="nowTitle">—</div>
+        <div class="now-sub" id="nowSub">00:00 / 00:00</div>
+      </div>
+      <div class="reel"></div>
+    </div>
+
+    <div class="transport">
+      <button class="ctrl" id="prevBtn" title="Предыдущий трек">
+        <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zM20 6v12L9 12z"/></svg>
+      </button>
+      <button class="ctrl" id="playBtn" title="Играть / Пауза">
+        <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <button class="ctrl" id="nextBtn" title="Следующий трек">
+        <svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM4 6v12l11-6z"/></svg>
+      </button>
+      <div class="seek-area">
+        <input type="range" id="progress" min="0" max="100" value="0">
+        <div class="seek-row">
+          <span id="curTime">0:00</span>
+          <span style="flex:1"></span>
+          <span id="durTime">0:00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vol-row">
+      <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/></svg>
+      <input type="range" id="volume" min="0" max="100" value="80">
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
+      <input type="text" id="searchInput" placeholder="Найти трек или исполнителя…">
+      <button class="search-clear" id="searchClear">×</button>
+    </div>
+    <button class="chip" id="likedChip" title="Показать только избранное">
+      <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-10-9C.4 8.6 2 5 5.5 5 8 5 9.6 6.8 12 9.5 14.4 6.8 16 5 18.5 5 22 5 23.6 8.6 22 12c-2.5 4.4-10 9-10 9z"/></svg>
+      <span id="likedChipLabel">Избранное · 0</span>
+    </button>
+  </div>
+
+  <div class="tracklist">
+    <div class="tl-head">
+      <h2 id="tlTitle">Трек-лист</h2>
+      <span id="totalTime">—</span>
+    </div>
+    <ul class="tracks" id="tracks"></ul>
+  </div>
+
+</div>
+
+<audio id="audio" preload="metadata"></audio>
+
+<script>
+// ======================================================================
+// ВСЕ ТРЕКИ ОДНИМ МАССИВОМ. album: какая вкладка; tier: "lite"/"pro".
+// Файлы — songs/N.mp3, N совпадает с полем n.
+// ======================================================================
+const ALL_TRACKS = [
+  { n: 1,  title: "Майонез",                    artist: "DJ Путария", album: "old-money",    tier: "lite", file: "songs/1.mp3" },
+  { n: 2,  title: "Самокатер",                   artist: "DJ Путария", album: "old-money",    tier: "lite", file: "songs/2.mp3" },
+  { n: 3,  title: "Не Квач",                     artist: "DJ Путария", album: "putaria-best", tier: "lite", file: "songs/3.mp3" },
+  { n: 4,  title: "Фляга",                       artist: "DJ Путария", album: "putaria-best", tier: "lite", file: "songs/4.mp3" },
+  { n: 5,  title: "Фляга фонк",                  artist: "DJ Путария", album: "putaria-best", tier: "lite", file: "songs/5.mp3" },
+  { n: 6,  title: "Скотина",                     artist: "DJ Путария", album: "putaria-best", tier: "lite", file: "songs/6.mp3" },
+  { n: 7,  title: "Поток воспоминаний (Воздух)", artist: "DJ Путария", album: "chanson",      tier: "lite", file: "songs/7.mp3" },
+  { n: 8,  title: "Гундарки (Воздух 2)",         artist: "DJ Путария", album: "putaria-best", tier: "pro",  file: "songs/8.mp3" },
+  { n: 9,  title: "Диджей Путария диз",          artist: "DJ Мясо",    album: "old-money",    tier: "lite", file: "songs/9.mp3" },
+  { n: 10, title: "Минск сити малл",             artist: "DJ Мясо",    album: "old-money",    tier: "lite", file: "songs/10.mp3" },
+  { n: 11, title: "Она",                         artist: "DJ Мясо",    album: "old-money",    tier: "pro",  file: "songs/11.mp3" },
+  { n: 12, title: "Майонез фит",                 artist: "DJ Мясо",    album: "old-money",    tier: "pro",  file: "songs/12.mp3" },
+  { n: 13, title: "Постербойность эпохи",        artist: "DJ Мясо",    album: "chanson",      tier: "lite", file: "songs/13.mp3" },
+  { n: 14, title: "Конфетный бит",               artist: "DJ Мясо",    album: "chanson",      tier: "lite", file: "songs/14.mp3" },
+  { n: 15, title: "Декольте",                    artist: "DJ Мясо",    album: "chanson",      tier: "lite", file: "songs/15.mp3" },
+  { n: 16, title: "Гамак",                       artist: "DJ Мясо",    album: "chanson",      tier: "pro",  file: "songs/16.mp3" },
+  { n: 17, title: "Сан-Паулу",                   artist: "DJ Мясо",    album: "chanson",      tier: "pro",  file: "songs/17.mp3" },
+  { n: 18, title: "Кобаченко обдурил тебя",      artist: "DJ Мясо",    album: "chanson",      tier: "lite", file: "songs/18.mp3" },
+  { n: 19, title: "Призон Бёрд",                 artist: "DJ Путария", album: "putaria-best", tier: "lite", file: "songs/19.mp3" },
+  { n: 20, title: "ЧЕКУШКАиВЕНЕЦ",               artist: "DJ Мясо",    album: "chanson",      tier: "lite", file: "songs/20.mp3" },
+  { n: 21, title: "Дядя Стёпа найс жёпа",        artist: "DJ Мясо",    album: "chanson",      tier: "lite", file: "songs/21.mp3" },
+  { n: 22, title: "Тру Скотина",                 artist: "DJ Путария", album: "putaria-best", tier: "lite", file: "songs/22.mp3" },
+  { n: 23, title: "Развязка",                    artist: "DJ Путария", album: "putaria-best", tier: "pro",  file: "songs/23.mp3" },
+];
+
+const ALBUM_META = {
+  "all":          { h1: "ВСЕ ПЕСНИ",     label: "Все песни" },
+  "old-money":    { h1: "OLD MONEY",     label: "Old Money" },
+  "putaria-best": { h1: "PUTARIABEST",   label: "PutariaBest" },
+  "chanson":      { h1: "ШАНСОН ЛУЧШЕЕ", label: "Шансон лучшее" },
+};
+
+const PRO_CODE = "228148867";
+const PRO_KEY = "album_pro_unlocked";
+const LIKES_KEY = "album_liked_tracks";
+
+let MODE = null;            // 'lite' | 'pro' — выбирается на входном экране
+let currentAlbum = "all";
+let currentTrackN = null;   // n текущего загруженного трека (не индекс! список меняется при фильтрах)
+let isPlaying = false;
+let searchQuery = "";
+let showOnlyLiked = false;
+let likedSet = new Set();
+
+// ---- TELEGRAM MINI APP ----
+function getTelegram(){ return (window.Telegram && window.Telegram.WebApp) || null; }
+(function initTelegram(){
+  const tg = getTelegram();
+  if (!tg) return;
+  try{
+    tg.ready();
+    tg.expand();
+    tg.setHeaderColor("#1c1610");
+    tg.setBackgroundColor("#1c1610");
+    if (typeof tg.disableVerticalSwipes === "function") tg.disableVerticalSwipes();
+  }catch(e){}
+})();
+
+// ---- ЛАЙКИ ----
+try{
+  const saved = JSON.parse(localStorage.getItem(LIKES_KEY) || "[]");
+  likedSet = new Set(saved);
+}catch(e){ likedSet = new Set(); }
+function saveLikes(){
+  try{ localStorage.setItem(LIKES_KEY, JSON.stringify([...likedSet])); }catch(e){}
+}
+function toggleLike(n){
+  if (likedSet.has(n)) likedSet.delete(n); else likedSet.add(n);
+  saveLikes();
+  updateLikedChip();
+  renderList();
+}
+function updateLikedChip(){ likedChipLabel.textContent = `Избранное · ${likedSet.size}`; }
+
+// ---- PRO+ хранение (localStorage + Telegram CloudStorage) ----
+function isProUnlockedLocally(){
+  try{ return localStorage.getItem(PRO_KEY) === "1"; }catch(e){ return false; }
+}
+function saveProUnlocked(){
+  try{ localStorage.setItem(PRO_KEY, "1"); }catch(e){}
+  const tg = getTelegram();
+  if (tg && tg.CloudStorage && typeof tg.CloudStorage.setItem === "function"){
+    tg.CloudStorage.setItem(PRO_KEY, "1", () => {});
+  }
+}
+function syncProFromCloud(onFound){
+  const tg = getTelegram();
+  if (tg && tg.CloudStorage && typeof tg.CloudStorage.getItem === "function"){
+    tg.CloudStorage.getItem(PRO_KEY, (err, value) => {
+      if (!err && value === "1") onFound();
+    });
+  }
+}
+
+// ===================== DOM ССЫЛКИ =====================
+const entryGate = document.getElementById('entryGate');
+const entryButtons = document.getElementById('entryButtons');
+const enterLiteBtn = document.getElementById('enterLiteBtn');
+const enterProBtn = document.getElementById('enterProBtn');
+const proBtnDesc = document.getElementById('proBtnDesc');
+const entryPasswordBlock = document.getElementById('entryPasswordBlock');
+const entryPasswordInput = document.getElementById('entryPasswordInput');
+const entryPasswordSubmit = document.getElementById('entryPasswordSubmit');
+const entryPasswordError = document.getElementById('entryPasswordError');
+const entryPasswordBack = document.getElementById('entryPasswordBack');
+
+const appEl = document.getElementById('app');
+const modeBadge = document.getElementById('modeBadge');
+const modeUpgradeBtn = document.getElementById('modeUpgradeBtn');
+const albumNav = document.getElementById('albumNav');
+const albumH1 = document.getElementById('albumH1');
+const albumLabel = document.getElementById('albumLabel');
+
+const audio = document.getElementById('audio');
+const tracksEl = document.getElementById('tracks');
+const playBtn = document.getElementById('playBtn');
+const playIcon = document.getElementById('playIcon');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const progress = document.getElementById('progress');
+const volume = document.getElementById('volume');
+const curTimeEl = document.getElementById('curTime');
+const durTimeEl = document.getElementById('durTime');
+const nowTitle = document.getElementById('nowTitle');
+const nowSub = document.getElementById('nowSub');
+const counter = document.getElementById('counter');
+const deck = document.getElementById('deck');
+const searchInput = document.getElementById('searchInput');
+const searchClear = document.getElementById('searchClear');
+const likedChip = document.getElementById('likedChip');
+const likedChipLabel = document.getElementById('likedChipLabel');
+const tlTitle = document.getElementById('tlTitle');
+
+const ICON_PLAY = '<path d="M8 5v14l11-7z"/>';
+const ICON_PAUSE = '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
+const EQ = '<div class="eq"><span></span><span></span><span></span></div>';
+const PLAY_DOT = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+const HEART_SVG = '<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-10-9C.4 8.6 2 5 5.5 5 8 5 9.6 6.8 12 9.5 14.4 6.8 16 5 18.5 5 22 5 23.6 8.6 22 12c-2.5 4.4-10 9-10 9z"/></svg>';
+
+function fmt(t){
+  if (!isFinite(t)) return "0:00";
+  const m = Math.floor(t / 60);
+  const s = Math.floor(t % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+}
+function trackWord(n){
+  const last2 = n % 100, last = n % 10;
+  if (last2 >= 11 && last2 <= 14) return "треков";
+  if (last === 1) return "трек";
+  if (last >= 2 && last <= 4) return "трека";
+  return "треков";
+}
+
+// ===================== ВИДИМЫЙ СПИСОК (зависит от вкладки альбома + режима + поиска/лайков) =====================
+function albumTracks(){
+  // в Pro+ доступны все треки альбома; в Lite — только lite-треки (pro-треки целиком скрыты,
+  // выбор версии происходит один раз на входе, а не точечно по трекам)
+  return ALL_TRACKS.filter(t =>
+    (currentAlbum === "all" || t.album === currentAlbum) &&
+    (MODE === "pro" || t.tier === "lite")
+  );
+}
+function getFilteredTracks(){
+  const q = searchQuery.trim().toLowerCase();
+  return albumTracks()
+    .filter(t => !showOnlyLiked || likedSet.has(t.n))
+    .filter(t => !q || t.title.toLowerCase().includes(q) || t.artist.toLowerCase().includes(q));
+}
+
+// ===================== РЕНДЕР ТРЕК-ЛИСТА =====================
+function renderList(){
+  const list = getFilteredTracks();
+  const albumTotal = albumTracks().length;
+  tlTitle.textContent = showOnlyLiked ? "Избранное" : "Трек-лист";
+
+  if (list.length === 0){
+    const msg = showOnlyLiked
+      ? `Пока пусто. Нажми <b>♥</b> у трека, чтобы добавить его сюда.`
+      : `Ничего не нашли по запросу «<b>${searchQuery}</b>». Попробуй другое слово.`;
+    tracksEl.innerHTML = `<li class="empty-state"><div class="ee">${showOnlyLiked ? "🤍" : "🔍"}</div><p>${msg}</p></li>`;
+    updateTotalTime(list);
+    return;
+  }
+
+  tracksEl.innerHTML = "";
+  list.forEach((t) => {
+    const liked = likedSet.has(t.n);
+    const isActive = t.n === currentTrackN;
+    const li = document.createElement("li");
+    li.className = "track" + (isActive ? " active" : "");
+    li.innerHTML = `
+      <span class="tnum">${String(t.n).padStart(2,"0")}</span>
+      <span class="tinfo">
+        <span class="ttitle">${t.title}${t.tier === "pro" ? '<span class="pro-badge">✨ Pro+</span>' : ""}${isActive ? `<span class="now-badge">${isPlaying ? '<span class="dot"></span> играет' : '⏸ пауза'}</span>` : ""}</span>
+        <span class="tsub">${t.artist} · Трек ${String(t.n).padStart(2,"0")} из ${albumTotal}</span>
+      </span>
+      <span class="tdur" id="dur-${t.n}">${t.duration ? fmt(t.duration) : "—:—"}</span>
+      <button class="icon-btn heart-btn${liked ? " liked" : ""}" data-n="${t.n}" title="${liked ? "Убрать из избранного" : "В избранное"}">${HEART_SVG}</button>
+      <span class="tplay" title="${isActive ? (isPlaying ? "Кликни, чтобы поставить на паузу" : "Кликни, чтобы продолжить") : "Кликни, чтобы включить"}">${(isActive && isPlaying) ? EQ : PLAY_DOT}</span>
+    `;
+    li.addEventListener("click", () => {
+      if (t.n === currentTrackN){
+        if (audio.paused) audio.play().catch(() => {});
+        else audio.pause();
+      } else {
+        loadTrackByN(t.n, true);
+      }
+    });
+    li.querySelector(".heart-btn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleLike(t.n);
+    });
+    tracksEl.appendChild(li);
+  });
+  updateTotalTime(list);
+}
+
+function preloadDurations(){
+  ALL_TRACKS.forEach((t) => {
+    if (t.duration) return;
+    const probe = new Audio();
+    probe.preload = "metadata";
+    probe.src = t.file;
+    probe.addEventListener("loadedmetadata", () => {
+      t.duration = probe.duration;
+      const el = document.getElementById(`dur-${t.n}`);
+      if (el) el.textContent = fmt(probe.duration);
+      updateTotalTime(getFilteredTracks());
+    });
+    probe.addEventListener("error", () => {});
+  });
+}
+
+function updateTotalTime(list){
+  const loaded = list.filter(t => t.duration);
+  const totalEl = document.getElementById("totalTime");
+  if (!loaded.length){ totalEl.textContent = "—"; return; }
+  const total = loaded.reduce((sum, t) => sum + t.duration, 0);
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const label = h > 0 ? `${h} ч ${m} мин` : `${m} мин`;
+  totalEl.textContent = loaded.length === list.length ? `≈ ${label}` : `≈ ${label} (загружено ${loaded.length}/${list.length})`;
+}
+
+// ===================== ПЛЕЕР =====================
+function loadTrackByN(n, autoplay){
+  const t = ALL_TRACKS.find(x => x.n === n);
+  if (!t) return;
+  currentTrackN = n;
+  audio.src = t.file;
+  nowTitle.textContent = `${t.title} · ${t.artist}`;
+  nowSub.textContent = "00:00 / 00:00";
+  const list = albumTracks();
+  const pos = list.findIndex(x => x.n === n);
+  counter.textContent = `${String(pos >= 0 ? pos + 1 : 1).padStart(2,"0")}/${list.length}`;
+  progress.value = 0;
+  renderList();
+  if (autoplay){ audio.play().catch(() => {}); }
+}
+
+function stepTrack(direction){
+  // движение в пределах текущей видимой вкладки альбома (без учёта поиска/лайков —
+  // чтобы prev/next не "терялись", если включён фильтр)
+  const list = albumTracks();
+  if (!list.length) return;
+  let pos = list.findIndex(x => x.n === currentTrackN);
+  if (pos === -1) pos = 0;
+  pos = (pos + direction + list.length) % list.length;
+  loadTrackByN(list[pos].n, true);
+}
+
+function setPlaying(state){
+  isPlaying = state;
+  deck.classList.toggle("playing", state);
+  playIcon.innerHTML = state ? ICON_PAUSE : ICON_PLAY;
+  renderList();
+}
+
+playBtn.addEventListener("click", () => {
+  if (audio.paused) audio.play().catch(() => {});
+  else audio.pause();
+});
+prevBtn.addEventListener("click", () => stepTrack(-1));
+nextBtn.addEventListener("click", () => stepTrack(1));
+audio.addEventListener("play", () => setPlaying(true));
+audio.addEventListener("pause", () => setPlaying(false));
+audio.addEventListener("ended", () => stepTrack(1));
+audio.addEventListener("timeupdate", () => {
+  if (audio.duration){
+    progress.value = (audio.currentTime / audio.duration) * 100;
+    curTimeEl.textContent = fmt(audio.currentTime);
+    durTimeEl.textContent = fmt(audio.duration);
+    nowSub.textContent = `${fmt(audio.currentTime)} / ${fmt(audio.duration)}`;
+  }
+});
+progress.addEventListener("input", () => {
+  if (audio.duration) audio.currentTime = (progress.value / 100) * audio.duration;
+});
+volume.addEventListener("input", () => { audio.volume = volume.value / 100; });
+audio.volume = volume.value / 100;
+
+// ===================== ПОИСК / ИЗБРАННОЕ =====================
+searchInput.addEventListener("input", () => {
+  searchQuery = searchInput.value;
+  searchClear.classList.toggle("show", searchQuery.length > 0);
+  renderList();
+});
+searchClear.addEventListener("click", () => {
+  searchInput.value = ""; searchQuery = "";
+  searchClear.classList.remove("show");
+  searchInput.focus();
+  renderList();
+});
+likedChip.addEventListener("click", () => {
+  showOnlyLiked = !showOnlyLiked;
+  likedChip.classList.toggle("active", showOnlyLiked);
+  renderList();
+});
+
+// ===================== ВКЛАДКИ АЛЬБОМОВ (SPA, музыка не прерывается) =====================
+albumNav.addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-album]");
+  if (!btn) return;
+  currentAlbum = btn.dataset.album;
+  [...albumNav.querySelectorAll("button")].forEach(b => b.classList.toggle("current", b === btn));
+  const meta = ALBUM_META[currentAlbum];
+  albumH1.textContent = meta.h1;
+  albumLabel.textContent = meta.label;
+  const list = albumTracks();
+  document.getElementById("sideLabel").textContent = `СТОРОНА A · ${list.length} ${trackWord(list.length)}`;
+  renderList();
+});
+
+// ===================== РЕЖИМ LITE / PRO+ (после входа можно апгрейднуться) =====================
+function applyMode(mode){
+  MODE = mode;
+  modeBadge.textContent = mode === "pro" ? "PRO+" : "LITE";
+  modeBadge.classList.toggle("pro", mode === "pro");
+  modeUpgradeBtn.classList.toggle("hidden", mode === "pro");
+}
+
+modeUpgradeBtn.addEventListener("click", () => {
+  openEntryPasswordInline();
+});
+
+// мини-форма апгрейда прямо внутри приложения (если выбрали Lite, но потом
+// захотели открыть Pro+ не перезагружая страницу)
+function openEntryPasswordInline(){
+  const code = prompt("Код Pro+:");
+  if (code === null) return;
+  if (code.trim() === PRO_CODE){
+    saveProUnlocked();
+    applyMode("pro");
+    const list = albumTracks();
+    document.getElementById("sideLabel").textContent = `СТОРОНА A · ${list.length} ${trackWord(list.length)}`;
+    renderList();
+  } else {
+    alert("Неверный код");
+  }
+}
+
+// ===================== ВХОДНОЙ ЭКРАН =====================
+function enterApp(mode){
+  applyMode(mode);
+  entryGate.classList.add("hidden");
+  appEl.classList.remove("hidden");
+
+  const list = albumTracks();
+  document.getElementById("sideLabel").textContent = `СТОРОНА A · ${list.length} ${trackWord(list.length)}`;
+  updateLikedChip();
+  if (list.length){ loadTrackByN(list[0].n, false); }
+  preloadDurations();
+}
+
+enterLiteBtn.addEventListener("click", () => enterApp("lite"));
+
+enterProBtn.addEventListener("click", () => {
+  if (isProUnlockedLocally()){
+    enterApp("pro");
+    return;
+  }
+  entryButtons.classList.add("hidden");
+  entryPasswordBlock.classList.remove("hidden");
+  entryPasswordInput.value = "";
+  entryPasswordError.textContent = "";
+  setTimeout(() => entryPasswordInput.focus(), 100);
+});
+
+function tryEntryPassword(){
+  if (entryPasswordInput.value.trim() === PRO_CODE){
+    saveProUnlocked();
+    enterApp("pro");
+  } else {
+    entryPasswordError.textContent = "Неверный код, попробуй ещё раз";
+    entryPasswordInput.value = "";
+    entryPasswordInput.focus();
+  }
+}
+entryPasswordSubmit.addEventListener("click", tryEntryPassword);
+entryPasswordInput.addEventListener("keydown", (e) => { if (e.key === "Enter") tryEntryPassword(); });
+entryPasswordBack.addEventListener("click", () => {
+  entryPasswordBlock.classList.add("hidden");
+  entryButtons.classList.remove("hidden");
+});
+
+// если код уже когда-то вводили на этом устройстве/аккаунте — подсказываем на кнопке
+if (isProUnlockedLocally()){
+  proBtnDesc.textContent = "Уже активирован — нажми, чтобы войти";
+}
+// если открыто в Telegram — подтягиваем статус Pro+ из облака (на случай другого устройства)
+syncProFromCloud(() => {
+  try{ localStorage.setItem(PRO_KEY, "1"); }catch(e){}
+  proBtnDesc.textContent = "Уже активирован — нажми, чтобы войти";
+});
+</script>
+</body>
+</html>
