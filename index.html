@@ -293,6 +293,7 @@ body.mode-pro{
   animation:wave-bar-in .4s cubic-bezier(.2,.9,.25,1.2);
 }
 @keyframes wave-bar-in{from{transform:translateX(-50%) translateY(20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+
 .wave-active-icon{font-size:18px;animation:wave-bob 1.8s ease-in-out infinite;flex-shrink:0}
 @keyframes wave-bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-3px) rotate(4deg)}}
 .wave-active-text{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -303,6 +304,64 @@ body.mode-pro{
 }
 .wave-exit-btn:hover{background:#0e0b07;transform:scale(1.04)}
 .wave-exit-btn:active{transform:scale(0.95)}
+
+/* ══════════ ИНТРО-ЗАСТАВКА ВОЛНЫ ══════════ */
+.wave-intro{
+  position:fixed;inset:0;z-index:600;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;
+  opacity:0;pointer-events:none;
+}
+.wave-intro.go{opacity:1;animation:wintro-in .35s ease forwards}
+.wave-intro.out{animation:wintro-out .4s ease forwards}
+@keyframes wintro-in{from{opacity:0}to{opacity:1}}
+@keyframes wintro-out{from{opacity:1}to{opacity:0}}
+.wave-intro-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 30% 30%,rgba(240,180,41,0.35),transparent 55%),
+    radial-gradient(circle at 70% 70%,rgba(224,120,58,0.3),transparent 55%),
+    radial-gradient(circle at 50% 50%,rgba(140,80,220,0.22),transparent 60%),
+    #0b0704;
+  background-size:220% 220%,220% 220%,220% 220%,100% 100%;
+  animation:wintro-bg-move 3.5s ease-in-out infinite;
+  filter:saturate(1.2);
+}
+@keyframes wintro-bg-move{
+  0%{background-position:0% 0%,100% 100%,50% 50%,0 0}
+  50%{background-position:100% 60%,10% 30%,60% 40%,0 0}
+  100%{background-position:0% 0%,100% 100%,50% 50%,0 0}
+}
+.wave-intro-stick{
+  position:relative;z-index:1;display:flex;align-items:center;gap:6px;height:44px;
+}
+.wave-intro-stick span{
+  display:block;width:6px;border-radius:4px;
+  background:linear-gradient(180deg,var(--amber),var(--pro));
+  animation:wintro-bar 0.9s ease-in-out infinite;
+  box-shadow:0 0 10px rgba(240,180,41,0.5);
+}
+.wave-intro-stick span:nth-child(1){height:14px;animation-delay:0s}
+.wave-intro-stick span:nth-child(2){height:30px;animation-delay:.12s}
+.wave-intro-stick span:nth-child(3){height:44px;animation-delay:.24s}
+.wave-intro-stick span:nth-child(4){height:30px;animation-delay:.36s}
+.wave-intro-stick span:nth-child(5){height:14px;animation-delay:.48s}
+@keyframes wintro-bar{0%,100%{transform:scaleY(0.4)}50%{transform:scaleY(1)}}
+.wave-intro-ball{
+  position:relative;z-index:1;width:34px;height:34px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fff6df,var(--amber) 45%,#a5710f 100%);
+  box-shadow:0 0 0 0 rgba(240,180,41,0.55),0 0 26px rgba(240,180,41,0.6);
+  animation:wintro-ball-pulse 0.9s ease-in-out infinite;
+}
+@keyframes wintro-ball-pulse{
+  0%,100%{transform:scale(0.85);box-shadow:0 0 0 0 rgba(240,180,41,0.55),0 0 20px rgba(240,180,41,0.5)}
+  50%{transform:scale(1.15);box-shadow:0 0 0 14px rgba(240,180,41,0),0 0 32px rgba(240,180,41,0.75)}
+}
+.wave-intro-text{
+  position:relative;z-index:1;
+  font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.05em;color:var(--cream);
+  text-shadow:0 4px 20px rgba(0,0,0,0.6);
+  animation:entry-in .4s cubic-bezier(.2,.9,.25,1.1) .1s backwards;
+}
 
 /* ══════════ MODE BAR (только Pro) ══════════ */
 .mode-bar{
@@ -712,8 +771,7 @@ ul.tracks{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
     <button class="chip" id="waveChip">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12c1.5-3 3-3 4.5 0s3 3 4.5 0 3-3 4.5 0 3 3 4.5 0"/></svg>
       <span>Волна</span>
-    </button>
-  </div>
+    </button>  </div>
   <div class="global-hint hidden" id="globalHint">Показаны треки из всех альбомов</div>
 
   <div class="tracklist">
@@ -755,6 +813,15 @@ ul.tracks{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
   <div class="wave-active-icon">🌊</div>
   <div class="wave-active-text">Волна играет · <span id="waveActiveCount">0</span> треков в ротации</div>
   <button class="wave-exit-btn" id="waveExitBtn">Выйти</button>
+</div>
+
+<div class="wave-intro hidden" id="waveIntro">
+  <div class="wave-intro-bg"></div>
+  <div class="wave-intro-stick">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <div class="wave-intro-ball"></div>
+  <div class="wave-intro-text">Волна пошла 🌊</div>
 </div>
 
 <script>
@@ -820,6 +887,7 @@ let waveActive = false;
 let waveSelectedAlbums = new Set(["old-money","putaria-best","chanson","newgen"]);
 let waveExcluded = new Set();
 let wavePool = [];
+let waveBag = [];
 let waveHistory = [];
 let waveHistoryPos = -1;
 let savedEyebrowText = "";
@@ -990,6 +1058,7 @@ const waveClose      = document.getElementById("waveClose");
 const waveAlbumsEl   = document.getElementById("waveAlbums");
 const waveTracksEl   = document.getElementById("waveTracks");
 const waveTrackCount = document.getElementById("waveTrackCount");
+
 const waveStartBtn   = document.getElementById("waveStartBtn");
 const waveActiveBar  = document.getElementById("waveActiveBar");
 const waveActiveCount= document.getElementById("waveActiveCount");
@@ -1111,6 +1180,26 @@ function renderWaveTracks() {
   waveStartBtn.disabled = count === 0;
 }
 
+function shuffledCopy(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// заполняем "мешок" перемешанными треками заново —
+// когда он пуст, значит каждый трек уже сыграл ровно по разу за круг
+function refillWaveBag(avoidFirst) {
+  let bag = shuffledCopy(wavePool);
+  if (avoidFirst != null && bag.length > 1 && bag[0] === avoidFirst) {
+    const idx = 1 + Math.floor(Math.random() * (bag.length - 1));
+    [bag[0], bag[idx]] = [bag[idx], bag[0]];
+  }
+  waveBag = bag;
+}
+
 function startWave() {
   const available = waveAvailableTracks().filter(t => waveSelectedAlbums.has(t.album) && !waveExcluded.has(t.n));
   if (!available.length) return;
@@ -1119,11 +1208,13 @@ function startWave() {
   waveChip.classList.add("active");
   waveHistory = [];
   waveHistoryPos = -1;
+  refillWaveBag();
   closeWaveModal();
   waveActiveBar.classList.remove("hidden");
   waveActiveCount.textContent = wavePool.length;
   if (!savedEyebrowText) savedEyebrowText = document.getElementById("sideLabel").textContent;
   document.getElementById("sideLabel").textContent = "🌊 ВОЛНА";
+  showWaveIntro();
   waveStep(true);
 }
 
@@ -1140,8 +1231,8 @@ function exitWave() {
 function waveStep(forward) {
   if (!wavePool.length) return;
   if (forward) {
-    const choices = wavePool.filter(n => n !== currentTrackN);
-    const pick = (choices.length ? choices : wavePool)[Math.floor(Math.random()*(choices.length ? choices.length : wavePool.length))];
+    if (!waveBag.length) refillWaveBag(currentTrackN);
+    const pick = waveBag.shift();
     waveHistory = waveHistory.slice(0, waveHistoryPos+1);
     waveHistory.push(pick);
     waveHistoryPos++;
@@ -1154,9 +1245,25 @@ function waveStep(forward) {
   }
 }
 
+// ── интро-заставка при запуске волны ──
+let waveIntroTimer = null;
+function showWaveIntro() {
+  const el = document.getElementById("waveIntro");
+  if (!el) return;
+  clearTimeout(waveIntroTimer);
+  el.classList.remove("hidden", "out");
+  void el.offsetWidth; // reflow, чтобы анимация точно перезапустилась
+  el.classList.add("go");
+  waveIntroTimer = setTimeout(() => {
+    el.classList.add("out");
+    setTimeout(() => { el.classList.add("hidden"); el.classList.remove("go","out"); }, 420);
+  }, 1050);
+}
+
 waveChip.addEventListener("click", openWaveModal);
 waveClose.addEventListener("click", closeWaveModal);
 waveOverlay.addEventListener("click", e => { if (e.target === waveOverlay) closeWaveModal(); });
+
 waveStartBtn.addEventListener("click", startWave);
 waveExitBtn.addEventListener("click", exitWave);
 
@@ -1306,6 +1413,7 @@ function loadByN(n, autoplay) {
   const pos = list.findIndex(x=>x.n===n);
   counter.textContent = `${String(pos>=0?pos+1:1).padStart(2,"0")}/${list.length || 1}`;
   updateTrackStates(); // список уже на месте — просто помечаем нужную строку активной
+  updateMediaSession(t);
   if (autoplay) audio.play().catch(()=>{});
 }
 
@@ -1323,6 +1431,7 @@ function setPlaying(state) {
   deck.classList.toggle("playing", state);
   playIcon.innerHTML = state ? ICON_PAUSE : ICON_PLAY;
   updateTrackStates();
+  if ("mediaSession" in navigator) navigator.mediaSession.playbackState = state ? "playing" : "paused";
 }
 
 playBtn.addEventListener("click", () => { playClickTick(); audio.paused ? audio.play().catch(()=>{}) : audio.pause(); });
@@ -1337,10 +1446,60 @@ audio.addEventListener("timeupdate", () => {
   curTimeEl.textContent = fmt(audio.currentTime);
   durTimeEl.textContent = fmt(audio.duration);
   nowSub.textContent = `${fmt(audio.currentTime)} / ${fmt(audio.duration)}`;
+  if ("mediaSession" in navigator && "setPositionState" in navigator.mediaSession) {
+    try {
+      navigator.mediaSession.setPositionState({
+        duration: audio.duration,
+        playbackRate: audio.playbackRate || 1,
+        position: Math.min(audio.currentTime, audio.duration)
+      });
+    } catch (e) {}
+  }
 });
 progress.addEventListener("input", () => { if (audio.duration) audio.currentTime=(progress.value/100)*audio.duration; });
 volume.addEventListener("input",   () => { audio.volume=volume.value/100; });
 audio.volume = .8;
+
+// ═══════════════════════════════════════════════════
+// MEDIA SESSION — карточка трека на шторке уведомлений / экране блокировки
+// (как «сейчас играет» у Telegram/Samsung). Показываются название, исполнитель,
+// прогресс и кнопки play/пауза/пред/след прямо в системном плеере.
+// Чтобы появилась обложка — положи квадратную картинку рядом с index.html
+// и пропиши её путь в MEDIA_ARTWORK ниже (например "cover.png").
+// ═══════════════════════════════════════════════════
+const MEDIA_ARTWORK = ""; // "cover.png" — путь к обложке 512×512, необязательно
+
+function updateMediaSession(t) {
+  if (!("mediaSession" in navigator)) return;
+  const artwork = MEDIA_ARTWORK
+    ? [
+        { src: MEDIA_ARTWORK, sizes: "96x96",   type: "image/png" },
+        { src: MEDIA_ARTWORK, sizes: "192x192", type: "image/png" },
+        { src: MEDIA_ARTWORK, sizes: "512x512", type: "image/png" }
+      ]
+    : [];
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: t.title,
+      artist: t.artist,
+      album: (ALBUM_META[t.album] && ALBUM_META[t.album].label) || "124DSGG",
+      artwork
+    });
+  } catch (e) {}
+}
+
+if ("mediaSession" in navigator) {
+  navigator.mediaSession.setActionHandler("play",  () => audio.play().catch(()=>{}));
+  navigator.mediaSession.setActionHandler("pause", () => audio.pause());
+  navigator.mediaSession.setActionHandler("previoustrack", () => { waveActive ? waveStep(false) : stepTrack(-1); });
+  navigator.mediaSession.setActionHandler("nexttrack",     () => { waveActive ? waveStep(true)  : stepTrack(1); });
+  try {
+    navigator.mediaSession.setActionHandler("seekto", (details) => {
+      if (audio.duration && details.seekTime != null) audio.currentTime = details.seekTime;
+    });
+  } catch (e) {}
+  navigator.mediaSession.setActionHandler("stop", () => audio.pause());
+}
 
 // ═══════════════════════════════════════════════════
 // ПОИСК / ЛАЙКИ (глобальные — игнорируют текущую вкладку альбома)
