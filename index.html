@@ -33,6 +33,7 @@ body{
   background-image:
     radial-gradient(ellipse at 20% 0%,rgba(224,168,58,0.08),transparent 55%),
     radial-gradient(ellipse at 80% 100%,rgba(201,79,40,0.08),transparent 55%);
+  background-size:160% 160%,160% 160%;
   color:var(--cream);
   font-family:'Inter',system-ui,sans-serif;
   min-height:100vh;
@@ -41,6 +42,11 @@ body{
   position:relative;
   overflow-x:hidden;
   transition:background .8s ease;
+  animation:body-bg-drift 26s ease-in-out infinite;
+}
+@keyframes body-bg-drift{
+  0%,100%{background-position:20% 0%,80% 100%}
+  50%{background-position:30% 15%,70% 85%}
 }
 body.mode-pro{
   background-image:
@@ -56,9 +62,18 @@ body.mode-pro{
 .bg-orb-1{width:280px;height:280px;background:radial-gradient(circle,var(--amber),transparent 70%);top:-80px;left:-60px;animation:orb-float-1 22s ease-in-out infinite}
 .bg-orb-2{width:320px;height:320px;background:radial-gradient(circle,var(--rust),transparent 70%);bottom:-100px;right:-80px;animation:orb-float-2 26s ease-in-out infinite}
 .bg-orb-3{width:200px;height:200px;background:radial-gradient(circle,var(--pro),transparent 70%);top:40%;right:-60px;opacity:0.2;animation:orb-float-3 19s ease-in-out infinite}
+.bg-orb-4{width:180px;height:180px;background:radial-gradient(circle,#8c50dc,transparent 70%);top:55%;left:-50px;opacity:0.16;animation:orb-float-4 24s ease-in-out infinite}
 @keyframes orb-float-1{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,60px)}}
 @keyframes orb-float-2{0%,100%{transform:translate(0,0)}50%{transform:translate(-50px,-40px)}}
 @keyframes orb-float-3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,50px) scale(1.15)}}
+@keyframes orb-float-4{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(35px,-45px) scale(1.1)}}
+.bg-aura{
+  position:fixed;top:50%;left:50%;width:900px;height:900px;margin:-450px 0 0 -450px;
+  pointer-events:none;z-index:0;opacity:0.05;
+  background:conic-gradient(from 0deg,var(--amber),var(--rust),#8c50dc,var(--pro),var(--amber));
+  filter:blur(120px);animation:aura-spin 40s linear infinite;
+}
+@keyframes aura-spin{to{transform:rotate(360deg)}}
 .bg-grain{
   position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.035;mix-blend-mode:overlay;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -669,7 +684,9 @@ ul.tracks{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
   <div class="bg-orb bg-orb-1"></div>
   <div class="bg-orb bg-orb-2"></div>
   <div class="bg-orb bg-orb-3"></div>
+  <div class="bg-orb bg-orb-4"></div>
 </div>
+<div class="bg-aura"></div>
 <div class="bg-grain"></div>
 
 
@@ -1467,15 +1484,15 @@ audio.volume = .8;
 // Чтобы появилась обложка — положи квадратную картинку рядом с index.html
 // и пропиши её путь в MEDIA_ARTWORK ниже (например "cover.png").
 // ═══════════════════════════════════════════════════
-const MEDIA_ARTWORK = ""; // "cover.png" — путь к обложке 512×512, необязательно
+const MEDIA_ARTWORK = "cover.jpg"; // обложка 512×512 для медиа-шторки / экрана блокировки
 
 function updateMediaSession(t) {
   if (!("mediaSession" in navigator)) return;
   const artwork = MEDIA_ARTWORK
     ? [
-        { src: MEDIA_ARTWORK, sizes: "96x96",   type: "image/png" },
-        { src: MEDIA_ARTWORK, sizes: "192x192", type: "image/png" },
-        { src: MEDIA_ARTWORK, sizes: "512x512", type: "image/png" }
+        { src: MEDIA_ARTWORK, sizes: "96x96",   type: "image/jpeg" },
+        { src: MEDIA_ARTWORK, sizes: "192x192", type: "image/jpeg" },
+        { src: MEDIA_ARTWORK, sizes: "512x512", type: "image/jpeg" }
       ]
     : [];
   try {
