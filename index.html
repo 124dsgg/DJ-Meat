@@ -38,9 +38,31 @@ body{
   min-height:100vh;
   display:flex;justify-content:center;
   padding:28px 14px 70px;
+  position:relative;
+  overflow-x:hidden;
+  transition:background .8s ease;
+}
+body.mode-pro{
+  background-image:
+    radial-gradient(ellipse at 20% 0%,rgba(240,180,41,0.13),transparent 55%),
+    radial-gradient(ellipse at 80% 100%,rgba(224,168,58,0.11),transparent 55%);
 }
 .hidden{display:none!important}
-.wrap{width:100%;max-width:620px}
+.wrap{width:100%;max-width:620px;position:relative;z-index:1}
+
+/* ── фоновые декоративные орбы (плывут медленно, чисто визуал) ── */
+.bg-decor{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.bg-orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:0.35}
+.bg-orb-1{width:280px;height:280px;background:radial-gradient(circle,var(--amber),transparent 70%);top:-80px;left:-60px;animation:orb-float-1 22s ease-in-out infinite}
+.bg-orb-2{width:320px;height:320px;background:radial-gradient(circle,var(--rust),transparent 70%);bottom:-100px;right:-80px;animation:orb-float-2 26s ease-in-out infinite}
+.bg-orb-3{width:200px;height:200px;background:radial-gradient(circle,var(--pro),transparent 70%);top:40%;right:-60px;opacity:0.2;animation:orb-float-3 19s ease-in-out infinite}
+@keyframes orb-float-1{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,60px)}}
+@keyframes orb-float-2{0%,100%{transform:translate(0,0)}50%{transform:translate(-50px,-40px)}}
+@keyframes orb-float-3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,50px) scale(1.15)}}
+.bg-grain{
+  position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.035;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
 
 /* ══════════ SPLASH / ЗАСТАВКА ══════════ */
 .splash{
@@ -184,6 +206,104 @@ body{
 .pro-flash.go{animation:pro-flash-anim .7s ease forwards}
 @keyframes pro-flash-anim{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
 
+/* ══════════ WAVE / ВОЛНА ══════════ */
+.wave-overlay{
+  position:fixed;inset:0;z-index:410;
+  background:rgba(6,4,2,0.82);backdrop-filter:blur(3px);
+  display:flex;align-items:flex-end;justify-content:center;
+  padding:0;
+}
+@media(min-width:620px){.wave-overlay{align-items:center;padding:20px}}
+.wave-card{
+  width:100%;max-width:520px;max-height:86vh;
+  background:linear-gradient(165deg,var(--panel2),var(--panel));
+  border:1px solid var(--line2);border-top:1px solid rgba(224,168,58,0.25);
+  border-radius:22px 22px 0 0;
+  padding:22px 20px calc(20px + env(safe-area-inset-bottom,0px));
+  display:flex;flex-direction:column;
+  box-shadow:0 -20px 60px -20px rgba(0,0,0,0.6);
+  animation:wave-card-in .35s cubic-bezier(.2,.9,.25,1.1);
+  overflow:hidden;
+}
+@media(min-width:620px){.wave-card{border-radius:22px}}
+@keyframes wave-card-in{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+.wave-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
+.wave-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.04em;color:var(--cream);line-height:1}
+.wave-sub{font-size:12px;color:var(--muted);margin-top:5px;max-width:340px;line-height:1.5}
+.wave-close{
+  background:var(--panel2);border:1px solid var(--line2);color:var(--cream);
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center;transition:all .18s ease;
+}
+.wave-close:hover{border-color:var(--rust);color:var(--rust);transform:rotate(90deg)}
+.wave-section-label{
+  font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:9px;display:flex;justify-content:space-between;align-items:baseline;
+}
+.wave-tracks-label{margin-top:16px}
+.wave-track-count{color:var(--amber);font-size:11px}
+.wave-albums{display:flex;flex-wrap:wrap;gap:7px}
+.wave-album-toggle{
+  font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:0.03em;
+  color:var(--muted);background:var(--panel2);border:1px solid var(--line2);border-radius:10px;
+  padding:9px 13px;cursor:pointer;transition:all .18s cubic-bezier(.2,.9,.25,1.3);
+  display:flex;align-items:center;gap:6px;
+}
+.wave-album-toggle:hover{transform:translateY(-1px);border-color:rgba(224,168,58,0.35)}
+.wave-album-toggle.on{color:var(--amber);border-color:rgba(224,168,58,0.5);background:var(--amber-dim)}
+.wave-album-toggle .wc-dot{width:6px;height:6px;border-radius:50%;background:var(--line2);transition:background .18s ease}
+.wave-album-toggle.on .wc-dot{background:var(--amber);box-shadow:0 0 6px var(--amber)}
+.wave-tracks{
+  flex:1;overflow-y:auto;min-height:60px;max-height:34vh;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  margin:4px 0 16px;padding:4px 0;
+}
+.wave-track-row{
+  display:flex;align-items:center;gap:11px;padding:9px 4px;cursor:pointer;
+  border-radius:8px;transition:background .15s ease;
+}
+.wave-track-row:hover{background:rgba(224,168,58,0.06)}
+.wave-track-checkbox{
+  width:19px;height:19px;flex-shrink:0;border-radius:6px;border:1.5px solid var(--line2);
+  display:flex;align-items:center;justify-content:center;transition:all .16s cubic-bezier(.2,.9,.25,1.4);
+  font-size:12px;color:transparent;
+}
+.wave-track-row.included .wave-track-checkbox{background:var(--amber);border-color:var(--amber);color:#0e0b07}
+.wave-track-title{flex:1;font-size:13px;color:var(--cream);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wave-track-row:not(.included) .wave-track-title{color:var(--muted);text-decoration:line-through;opacity:0.6}
+.wave-track-tag{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);flex-shrink:0}
+.wave-start-btn{
+  width:100%;padding:15px;border-radius:14px;
+  background:linear-gradient(135deg,var(--pro),#c8921a);
+  border:none;color:#0e0b07;font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:0.05em;
+  cursor:pointer;box-shadow:0 10px 26px -8px rgba(240,180,41,0.4);
+  transition:transform .14s cubic-bezier(.2,.9,.25,1.3),box-shadow .18s ease,opacity .18s ease;
+}
+.wave-start-btn:hover{transform:translateY(-2px);box-shadow:0 14px 30px -6px rgba(240,180,41,0.5)}
+.wave-start-btn:active{transform:scale(0.97)}
+.wave-start-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
+
+.wave-active-bar{
+  position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:200;
+  display:flex;align-items:center;gap:12px;
+  background:linear-gradient(135deg,rgba(240,180,41,0.95),rgba(224,168,58,0.95));
+  color:#120c06;border-radius:16px;padding:12px 14px 12px 16px;
+  box-shadow:0 16px 40px -12px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.15) inset;
+  max-width:calc(100vw - 32px);
+  animation:wave-bar-in .4s cubic-bezier(.2,.9,.25,1.2);
+}
+@keyframes wave-bar-in{from{transform:translateX(-50%) translateY(20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+.wave-active-icon{font-size:18px;animation:wave-bob 1.8s ease-in-out infinite;flex-shrink:0}
+@keyframes wave-bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-3px) rotate(4deg)}}
+.wave-active-text{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wave-exit-btn{
+  font-family:'Inter',sans-serif;font-weight:700;font-size:11.5px;
+  background:rgba(14,11,7,0.85);color:var(--pro);border:none;border-radius:10px;
+  padding:8px 13px;cursor:pointer;flex-shrink:0;transition:all .16s ease;
+}
+.wave-exit-btn:hover{background:#0e0b07;transform:scale(1.04)}
+.wave-exit-btn:active{transform:scale(0.95)}
+
 /* ══════════ MODE BAR (только Pro) ══════════ */
 .mode-bar{
   display:flex;align-items:center;gap:8px;margin-bottom:14px;
@@ -200,15 +320,14 @@ body{
 .mode-text{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--pro)}
 
 /* ══════════ ALBUM NAV ══════════ */
-.albumnav{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none}
-.albumnav::-webkit-scrollbar{display:none}
+.albumnav{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px}
 .albumnav button{
-  flex-shrink:0;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.04em;
+  font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.04em;
   color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:9px;
-  padding:8px 12px;cursor:pointer;white-space:nowrap;
+  padding:10px 8px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   transition:transform .18s cubic-bezier(.2,.9,.25,1.3),background .18s ease,color .18s ease,
              border-color .18s ease,box-shadow .18s ease;
-  position:relative;overflow:hidden;
+  position:relative;
 }
 .albumnav button::after{
   content:'';position:absolute;inset:0;border-radius:inherit;
@@ -233,6 +352,16 @@ body{
   animation:deck-in .5s cubic-bezier(.2,.9,.25,1.1);
 }
 .deck:hover{border-color:rgba(224,168,58,0.22)}
+body.mode-pro .deck{
+  border-color:rgba(240,180,41,0.4);
+  box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,0.04),0 0 42px -12px rgba(240,180,41,0.35);
+}
+body.mode-pro .deck::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(120deg,transparent 30%,rgba(240,180,41,0.06) 50%,transparent 70%);
+  background-size:250% 250%;animation:pro-deck-shine 6s ease-in-out infinite;
+}
+@keyframes pro-deck-shine{0%{background-position:200% 0}100%{background-position:-50% 0}}
 .deck.playing{box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,0.04),0 0 40px -18px rgba(224,168,58,0.35)}
 @keyframes deck-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .deck::before{
@@ -242,7 +371,9 @@ body{
 }
 .deck-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px}
 .eyebrow{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.24em;text-transform:uppercase;color:var(--muted)}
-.counter{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--amber);letter-spacing:0.1em}
+.counter{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--amber);letter-spacing:0.1em;transition:color .3s ease}
+body.mode-pro .counter{color:var(--pro)}
+body.mode-pro .eyebrow::after{content:' · 👑';opacity:0.7}
 h1{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:0.04em;margin:0;line-height:1;color:var(--cream);animation:h1-in .35s cubic-bezier(.2,.9,.25,1.2)}
 @keyframes h1-in{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
 .album-artist{font-size:12.5px;color:var(--amber);margin:5px 0 16px;font-weight:500;animation:h1-in .35s cubic-bezier(.2,.9,.25,1.2) .05s backwards}
@@ -323,6 +454,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 .chip:hover svg{transform:scale(1.15)}
 .chip.active{color:var(--amber);border-color:rgba(224,168,58,0.5);background:var(--amber-dim);animation:tab-pulse 2.4s ease-in-out infinite}
 .chip.active svg{fill:var(--rust);animation:heart-beat 1.1s ease-in-out infinite}
+#waveChip svg{fill:none!important;stroke:var(--muted)}
+#waveChip:hover svg{stroke:var(--cream)}
+#waveChip.active{color:var(--pro);border-color:rgba(240,180,41,0.5);background:var(--pro-dim)}
+#waveChip.active svg{stroke:var(--pro);fill:none!important;animation:wave-flow 1.6s ease-in-out infinite}
+@keyframes wave-flow{0%,100%{stroke-dashoffset:0}50%{stroke-dashoffset:6}}
 @keyframes heart-beat{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
 input[type=range]{transition:filter .15s ease}
 input[type=range]:hover{filter:brightness(1.15)}
@@ -470,6 +606,13 @@ ul.tracks{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
 </style>
 </head>
 <body>
+<div class="bg-decor">
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+</div>
+<div class="bg-grain"></div>
+
 
 <!-- ══════════ SPLASH / ЗАСТАВКА АВТОРА ══════════ -->
 <div class="splash" id="splash">
@@ -566,6 +709,10 @@ ul.tracks{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
       <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-10-9C.4 8.6 2 5 5.5 5 8 5 9.6 6.8 12 9.5 14.4 6.8 16 5 18.5 5 22 5 23.6 8.6 22 12c-2.5 4.4-10 9-10 9z"/></svg>
       <span id="likedChipLabel">Избранное · 0</span>
     </button>
+    <button class="chip" id="waveChip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12c1.5-3 3-3 4.5 0s3 3 4.5 0 3-3 4.5 0 3 3 4.5 0"/></svg>
+      <span>Волна</span>
+    </button>
   </div>
   <div class="global-hint hidden" id="globalHint">Показаны треки из всех альбомов</div>
 
@@ -579,6 +726,36 @@ ul.tracks{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
 </div>
 
 <audio id="audio" preload="metadata"></audio>
+
+<!-- ══════════ WAVE / ВОЛНА — настройка и активный баннер ══════════ -->
+<div class="wave-overlay hidden" id="waveOverlay">
+  <div class="wave-card">
+    <div class="wave-head">
+      <div>
+        <div class="wave-title">🌊 Волна</div>
+        <div class="wave-sub">Случайные треки из выбранных альбомов — настрой ротацию под себя</div>
+      </div>
+      <button class="wave-close" id="waveClose">×</button>
+    </div>
+
+    <div class="wave-section-label">Альбомы в ротации</div>
+    <div class="wave-albums" id="waveAlbums"></div>
+
+    <div class="wave-section-label wave-tracks-label">
+      <span>Треки в ротации</span>
+      <span class="wave-track-count" id="waveTrackCount">0</span>
+    </div>
+    <div class="wave-tracks" id="waveTracks"></div>
+
+    <button class="wave-start-btn" id="waveStartBtn">Запустить волну 🌊</button>
+  </div>
+</div>
+
+<div class="wave-active-bar hidden" id="waveActiveBar">
+  <div class="wave-active-icon">🌊</div>
+  <div class="wave-active-text">Волна играет · <span id="waveActiveCount">0</span> треков в ротации</div>
+  <button class="wave-exit-btn" id="waveExitBtn">Выйти</button>
+</div>
 
 <script>
 // ═══════════════════════════════════════════════════
@@ -638,6 +815,15 @@ let searchQuery = "";
 let showOnlyLiked = false;
 let likedSet = new Set();
 
+// ── волна ──
+let waveActive = false;
+let waveSelectedAlbums = new Set(["old-money","putaria-best","chanson","newgen"]);
+let waveExcluded = new Set();
+let wavePool = [];
+let waveHistory = [];
+let waveHistoryPos = -1;
+let savedEyebrowText = "";
+
 // ── Telegram ──
 const tg = (window.Telegram && window.Telegram.WebApp) || null;
 if (tg) {
@@ -652,7 +838,16 @@ if (tg) {
 // ── лайки (глобальные, across всех альбомов) ──
 try { likedSet = new Set(JSON.parse(localStorage.getItem(LIKES_KEY)||"[]")); } catch(e) {}
 function saveLikes() { try { localStorage.setItem(LIKES_KEY, JSON.stringify([...likedSet])); } catch(e) {} }
-function toggleLike(n) { likedSet.has(n) ? likedSet.delete(n) : likedSet.add(n); saveLikes(); updateLikedChip(); renderList(); }
+function toggleLike(n) {
+  likedSet.has(n) ? likedSet.delete(n) : likedSet.add(n);
+  saveLikes();
+  updateLikedChip();
+  if (showOnlyLiked) {
+    renderList(); // набор треков реально меняется — тут пересборка уместна
+  } else {
+    updateHeartIcon(n); // просто переключаем иконку у одной строки, без разрушения списка
+  }
+}
 function updateLikedChip() { likedChipLabel.textContent = `Избранное · ${likedSet.size}`; }
 
 // ── Pro+ хранение ──
@@ -690,6 +885,60 @@ function playBassHit() {
     sub.connect(subGain); subGain.connect(ctx.destination);
     osc.start(); sub.start();
     osc.stop(ctx.currentTime + 1.4); sub.stop(ctx.currentTime + 1.6);
+  } catch(e) {}
+}
+
+// ── общий AudioContext переиспользуется для всех UI-звуков (не создаём
+// новый на каждый чих — это и дороже, и часть браузеров лимитируют их
+// количество) ──
+let sharedCtx = null;
+function getAudioCtx() {
+  if (!sharedCtx) {
+    try { sharedCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e) { return null; }
+  }
+  if (sharedCtx.state === "suspended") sharedCtx.resume().catch(()=>{});
+  return sharedCtx;
+}
+function playTone(freq, dur, vol) {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(vol, ctx.currentTime + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + dur + 0.02);
+  } catch(e) {}
+}
+let lastHoverSoundAt = 0;
+function playHoverTick() {
+  const now = performance.now();
+  if (now - lastHoverSoundAt < 90) return; // не спамим при быстром проведении мышью
+  lastHoverSoundAt = now;
+  playTone(1500, 0.03, 0.018);
+}
+function playClickTick() { playTone(720, 0.055, 0.045); }
+function playLikeTick() {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  try {
+    [880, 1320].forEach((f, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      const t0 = ctx.currentTime + i*0.045;
+      osc.frequency.setValueAtTime(f, t0);
+      gain.gain.setValueAtTime(0.0001, t0);
+      gain.gain.exponentialRampToValueAtTime(0.065, t0 + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.09);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(t0); osc.stop(t0 + 0.1);
+    });
   } catch(e) {}
 }
 
@@ -734,6 +983,17 @@ const searchClear = document.getElementById("searchClear");
 const likedChip   = document.getElementById("likedChip");
 const likedChipLabel = document.getElementById("likedChipLabel");
 const tlTitle     = document.getElementById("tlTitle");
+
+const waveChip       = document.getElementById("waveChip");
+const waveOverlay    = document.getElementById("waveOverlay");
+const waveClose      = document.getElementById("waveClose");
+const waveAlbumsEl   = document.getElementById("waveAlbums");
+const waveTracksEl   = document.getElementById("waveTracks");
+const waveTrackCount = document.getElementById("waveTrackCount");
+const waveStartBtn   = document.getElementById("waveStartBtn");
+const waveActiveBar  = document.getElementById("waveActiveBar");
+const waveActiveCount= document.getElementById("waveActiveCount");
+const waveExitBtn    = document.getElementById("waveExitBtn");
 
 const ICON_PLAY  = '<path d="M8 5v14l11-7z"/>';
 const ICON_PAUSE = '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
@@ -790,6 +1050,123 @@ function updateNavCounts() {
 }
 
 // ═══════════════════════════════════════════════════
+// ВОЛНА — случайное воспроизведение по настраиваемому пулу треков
+// ═══════════════════════════════════════════════════
+const WAVE_ALBUM_ORDER = ["old-money","putaria-best","chanson","newgen"];
+
+function waveAvailableTracks() {
+  // те же треки, что видны в текущем режиме (Lite не видит pro-треки)
+  return baseList();
+}
+
+function openWaveModal() {
+  renderWaveAlbums();
+  renderWaveTracks();
+  waveOverlay.classList.remove("hidden");
+}
+function closeWaveModal() {
+  waveOverlay.classList.add("hidden");
+}
+
+function renderWaveAlbums() {
+  const available = waveAvailableTracks();
+  waveAlbumsEl.innerHTML = "";
+  WAVE_ALBUM_ORDER.forEach(key => {
+    const count = available.filter(t => t.album===key).length;
+    if (count === 0) return; // нечего крутить — не показываем переключатель
+    const on = waveSelectedAlbums.has(key);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "wave-album-toggle" + (on ? " on" : "");
+    btn.innerHTML = `<span class="wc-dot"></span>${ALBUM_META[key].label} · ${count}`;
+    btn.addEventListener("click", () => {
+      waveSelectedAlbums.has(key) ? waveSelectedAlbums.delete(key) : waveSelectedAlbums.add(key);
+      renderWaveAlbums();
+      renderWaveTracks();
+    });
+    waveAlbumsEl.appendChild(btn);
+  });
+}
+
+function renderWaveTracks() {
+  const available = waveAvailableTracks().filter(t => waveSelectedAlbums.has(t.album));
+  waveTracksEl.innerHTML = "";
+  available.forEach(t => {
+    const included = !waveExcluded.has(t.n);
+    const row = document.createElement("div");
+    row.className = "wave-track-row" + (included ? " included" : "");
+    row.innerHTML = `
+      <span class="wave-track-checkbox">${included ? "✓" : ""}</span>
+      <span class="wave-track-title">${t.title}</span>
+      <span class="wave-track-tag">${ALBUM_SHORT[t.album]}</span>
+    `;
+    row.addEventListener("click", () => {
+      waveExcluded.has(t.n) ? waveExcluded.delete(t.n) : waveExcluded.add(t.n);
+      renderWaveTracks();
+    });
+    waveTracksEl.appendChild(row);
+  });
+  const count = available.filter(t => !waveExcluded.has(t.n)).length;
+  waveTrackCount.textContent = count;
+  waveStartBtn.disabled = count === 0;
+}
+
+function startWave() {
+  const available = waveAvailableTracks().filter(t => waveSelectedAlbums.has(t.album) && !waveExcluded.has(t.n));
+  if (!available.length) return;
+  wavePool = available.map(t => t.n);
+  waveActive = true;
+  waveChip.classList.add("active");
+  waveHistory = [];
+  waveHistoryPos = -1;
+  closeWaveModal();
+  waveActiveBar.classList.remove("hidden");
+  waveActiveCount.textContent = wavePool.length;
+  if (!savedEyebrowText) savedEyebrowText = document.getElementById("sideLabel").textContent;
+  document.getElementById("sideLabel").textContent = "🌊 ВОЛНА";
+  waveStep(true);
+}
+
+function exitWave() {
+  waveActive = false;
+  waveChip.classList.remove("active");
+  waveActiveBar.classList.add("hidden");
+  if (savedEyebrowText) {
+    document.getElementById("sideLabel").textContent = savedEyebrowText;
+    savedEyebrowText = "";
+  }
+}
+
+function waveStep(forward) {
+  if (!wavePool.length) return;
+  if (forward) {
+    const choices = wavePool.filter(n => n !== currentTrackN);
+    const pick = (choices.length ? choices : wavePool)[Math.floor(Math.random()*(choices.length ? choices.length : wavePool.length))];
+    waveHistory = waveHistory.slice(0, waveHistoryPos+1);
+    waveHistory.push(pick);
+    waveHistoryPos++;
+    loadByN(pick, true);
+  } else if (waveHistoryPos > 0) {
+    waveHistoryPos--;
+    loadByN(waveHistory[waveHistoryPos], true);
+  } else {
+    waveStep(true);
+  }
+}
+
+waveChip.addEventListener("click", openWaveModal);
+waveClose.addEventListener("click", closeWaveModal);
+waveOverlay.addEventListener("click", e => { if (e.target === waveOverlay) closeWaveModal(); });
+waveStartBtn.addEventListener("click", startWave);
+waveExitBtn.addEventListener("click", exitWave);
+
+// hover-звук на строки трек-листа — один делегированный слушатель,
+// переживает любые перерисовки списка
+tracksEl.addEventListener("mouseover", e => {
+  if (e.target.closest(".track")) playHoverTick();
+});
+
+// ═══════════════════════════════════════════════════
 // РЕНДЕР
 // ═══════════════════════════════════════════════════
 function renderList() {
@@ -821,6 +1198,7 @@ function renderList() {
 
     const li = document.createElement("li");
     li.className = "track" + (isPro ? " pro-track" : "") + (isActive ? " active" : "");
+    li.dataset.n = String(t.n);
     li.innerHTML = `
       <span class="tnum">${String(idx+1).padStart(2,"0")}</span>
       <span class="tinfo">
@@ -840,14 +1218,52 @@ function renderList() {
       if (t.n === currentTrackN) {
         audio.paused ? audio.play().catch(()=>{}) : audio.pause();
       } else {
+        playClickTick();
+        if (waveActive) exitWave(); // ручной выбор трека — явный выход из волны
         loadByN(t.n, true);
       }
     });
-    li.querySelector(".heart-btn").addEventListener("click", e => { e.stopPropagation(); toggleLike(t.n); });
+    li.querySelector(".heart-btn").addEventListener("click", e => {
+      e.stopPropagation();
+      toggleLike(t.n);
+      likedSet.has(t.n) ? playLikeTick() : playHoverTick();
+    });
     tracksEl.appendChild(li);
   });
 
   updateTotalTime(list);
+}
+
+// ── ЛЁГКИЕ обновления: меняют только нужные строки БЕЗ разрушения DOM,
+// поэтому анимация появления не переигрывается зря (это и было причиной
+// бага "все треки на секунду пропадают" при каждом play/pause/лайке) ──
+function updateTrackStates() {
+  const rows = tracksEl.querySelectorAll(".track[data-n]");
+  rows.forEach(li => {
+    const n = Number(li.dataset.n);
+    const isActive = n === currentTrackN;
+    li.classList.toggle("active", isActive);
+
+    const titleSpan = li.querySelector(".ttitle");
+    const existingBadge = titleSpan && titleSpan.querySelector(".now-badge");
+    if (existingBadge) existingBadge.remove();
+    if (isActive && titleSpan) {
+      const badge = document.createElement("span");
+      badge.className = "now-badge";
+      badge.innerHTML = isPlaying ? '<span class="dot"></span> играет' : "⏸ пауза";
+      titleSpan.appendChild(badge);
+    }
+
+    const playSpan = li.querySelector(".tplay");
+    if (playSpan) playSpan.innerHTML = (isActive && isPlaying) ? EQ : PLAY_DOT;
+  });
+}
+function updateHeartIcon(n) {
+  const li = tracksEl.querySelector(`.track[data-n="${n}"]`);
+  if (!li) return;
+  const btn = li.querySelector(".heart-btn");
+  if (!btn) return;
+  btn.classList.toggle("liked", likedSet.has(n));
 }
 
 function updateTotalTime(list) {
@@ -889,7 +1305,7 @@ function loadByN(n, autoplay) {
   const list = getFiltered();
   const pos = list.findIndex(x=>x.n===n);
   counter.textContent = `${String(pos>=0?pos+1:1).padStart(2,"0")}/${list.length || 1}`;
-  renderList();
+  updateTrackStates(); // список уже на месте — просто помечаем нужную строку активной
   if (autoplay) audio.play().catch(()=>{});
 }
 
@@ -906,15 +1322,15 @@ function setPlaying(state) {
   isPlaying = state;
   deck.classList.toggle("playing", state);
   playIcon.innerHTML = state ? ICON_PAUSE : ICON_PLAY;
-  renderList();
+  updateTrackStates();
 }
 
-playBtn.addEventListener("click", () => audio.paused ? audio.play().catch(()=>{}) : audio.pause());
-prevBtn.addEventListener("click", () => stepTrack(-1));
-nextBtn.addEventListener("click", () => stepTrack(1));
+playBtn.addEventListener("click", () => { playClickTick(); audio.paused ? audio.play().catch(()=>{}) : audio.pause(); });
+prevBtn.addEventListener("click", () => { playClickTick(); waveActive ? waveStep(false) : stepTrack(-1); });
+nextBtn.addEventListener("click", () => { playClickTick(); waveActive ? waveStep(true) : stepTrack(1); });
 audio.addEventListener("play",  () => setPlaying(true));
 audio.addEventListener("pause", () => setPlaying(false));
-audio.addEventListener("ended", () => stepTrack(1));
+audio.addEventListener("ended", () => waveActive ? waveStep(true) : stepTrack(1));
 audio.addEventListener("timeupdate", () => {
   if (!audio.duration) return;
   progress.value = (audio.currentTime/audio.duration)*100;
@@ -940,6 +1356,7 @@ searchClear.addEventListener("click", () => {
   searchInput.focus(); renderList();
 });
 likedChip.addEventListener("click", () => {
+  playClickTick();
   showOnlyLiked=!showOnlyLiked;
   likedChip.classList.toggle("active", showOnlyLiked);
   renderList();
@@ -948,9 +1365,14 @@ likedChip.addEventListener("click", () => {
 // ═══════════════════════════════════════════════════
 // ВКЛАДКИ АЛЬБОМОВ
 // ═══════════════════════════════════════════════════
+albumNav.addEventListener("mouseover", e => {
+  if (e.target.closest("button[data-album]")) playHoverTick();
+});
 albumNav.addEventListener("click", e => {
   const btn = e.target.closest("button[data-album]");
   if (!btn || btn.classList.contains("hidden")) return;
+  playClickTick();
+  if (waveActive) exitWave(); // смена вкладки — явный выход из волны, чтобы не было расхождений в шапке
   currentAlbum = btn.dataset.album;
   [...albumNav.querySelectorAll("button")].forEach(b => b.classList.toggle("current", b===btn));
   const meta = ALBUM_META[currentAlbum];
@@ -967,6 +1389,7 @@ albumNav.addEventListener("click", e => {
 function applyMode(mode) {
   MODE = mode;
   modeBar.classList.toggle("hidden", mode !== "pro");
+  document.body.classList.toggle("mode-pro", mode === "pro");
   updateNavCounts();
 }
 
@@ -977,6 +1400,7 @@ function enterApp(mode) {
   const list = getFiltered();
   document.getElementById("sideLabel").textContent = `СТОРОНА A · ${list.length} ${trackWord(list.length)}`;
   updateLikedChip();
+  renderList(); // первичная отрисовка — единственный раз, когда список строится с нуля
   if (list.length) loadByN(list[0].n, false);
   preloadDurations();
 }
