@@ -323,6 +323,8 @@ body.mode-pro{
 .wave-active-icon{font-size:18px;animation:wave-bob 1.8s ease-in-out infinite;flex-shrink:0}
 @keyframes wave-bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-3px) rotate(4deg)}}
 .wave-active-text{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wave-active-open{display:flex;align-items:center;gap:12px;cursor:pointer;min-width:0;flex:1}
+.wave-active-open:active{opacity:0.75}
 
 /* мини-эквалайзер + шарик — крутятся всё время, пока волна активна */
 .wave-mini-eq{display:flex;align-items:flex-end;gap:2.5px;height:16px;flex-shrink:0}
@@ -347,63 +349,104 @@ body.mode-pro{
 .wave-exit-btn:hover{background:#0e0b07;transform:scale(1.04)}
 .wave-exit-btn:active{transform:scale(0.95)}
 
-/* ══════════ ИНТРО-ЗАСТАВКА ВОЛНЫ ══════════ */
+/* ══════════ ЭКРАН ВОЛНЫ (отдельное окно, пока волна активна) ══════════ */
 .wave-intro{
-  position:fixed;inset:0;z-index:600;
+  position:fixed;inset:0;z-index:600;overflow:hidden;
+  background:#08050a;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;
-  opacity:0;pointer-events:none;
+  opacity:0;pointer-events:none;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;user-select:none;
 }
-.wave-intro.go{opacity:1;animation:wintro-in .35s ease forwards}
+.wave-intro.go{opacity:1;animation:wintro-in .45s ease forwards}
 .wave-intro.out{animation:wintro-out .4s ease forwards}
+.wave-intro.open{pointer-events:auto}
 @keyframes wintro-in{from{opacity:0}to{opacity:1}}
 @keyframes wintro-out{from{opacity:1}to{opacity:0}}
+
 .wave-intro-bg{
   position:absolute;inset:0;
-  background:
-    radial-gradient(circle at 30% 30%,rgba(240,180,41,0.35),transparent 55%),
-    radial-gradient(circle at 70% 70%,rgba(224,120,58,0.3),transparent 55%),
-    radial-gradient(circle at 50% 50%,rgba(140,80,220,0.22),transparent 60%),
-    #0b0704;
-  background-size:220% 220%,220% 220%,220% 220%,100% 100%;
-  animation:wintro-bg-move 3.5s ease-in-out infinite;
-  filter:saturate(1.2);
+  background-color:transparent;
+  background-image:
+    radial-gradient(circle at 25% 20%,rgba(240,180,41,0.4),transparent 52%),
+    radial-gradient(circle at 78% 78%,rgba(224,90,40,0.32),transparent 52%),
+    radial-gradient(circle at 50% 55%,rgba(140,80,220,0.26),transparent 58%),
+    radial-gradient(circle at 85% 15%,rgba(60,180,200,0.16),transparent 45%);
+  background-size:240% 240%,240% 240%,260% 260%,220% 220%;
+  animation:wintro-bg-move 6s ease-in-out infinite;
+}
+.wave-intro-bg::before{
+  content:'';position:absolute;inset:0;background:#08050a;z-index:-1;
 }
 @keyframes wintro-bg-move{
-  0%{background-position:0% 0%,100% 100%,50% 50%,0 0}
-  50%{background-position:100% 60%,10% 30%,60% 40%,0 0}
-  100%{background-position:0% 0%,100% 100%,50% 50%,0 0}
+  0%{background-position:0% 0%,100% 100%,50% 60%,90% 10%}
+  50%{background-position:35% 25%,65% 70%,60% 40%,70% 25%}
+  100%{background-position:0% 0%,100% 100%,50% 60%,90% 10%}
 }
-.wave-intro-stick{
-  position:relative;z-index:1;display:flex;align-items:center;gap:6px;height:44px;
+
+/* плавающие частицы — просто атмосфера, дёшево (только transform+opacity) */
+.wave-intro-particles{position:absolute;inset:0;overflow:hidden}
+.wave-intro-particles span{
+  position:absolute;bottom:-10px;width:4px;height:4px;border-radius:50%;
+  background:var(--amber);opacity:0;
+  animation:particle-rise linear infinite;
+  box-shadow:0 0 6px rgba(240,180,41,0.8);
 }
-.wave-intro-stick span{
-  display:block;width:6px;border-radius:4px;
-  background:linear-gradient(180deg,var(--amber),var(--pro));
-  animation:wintro-bar 0.9s ease-in-out infinite;
-  box-shadow:0 0 10px rgba(240,180,41,0.5);
+.wave-intro-particles span:nth-child(1){left:8%;animation-duration:7s;animation-delay:.2s}
+.wave-intro-particles span:nth-child(2){left:20%;animation-duration:9s;animation-delay:1.6s;background:var(--pro)}
+.wave-intro-particles span:nth-child(3){left:34%;animation-duration:6.5s;animation-delay:.8s}
+.wave-intro-particles span:nth-child(4){left:48%;animation-duration:8.2s;animation-delay:2.4s;background:#8c50dc}
+.wave-intro-particles span:nth-child(5){left:62%;animation-duration:7.4s;animation-delay:0s;background:var(--pro)}
+.wave-intro-particles span:nth-child(6){left:74%;animation-duration:9.6s;animation-delay:1.2s}
+.wave-intro-particles span:nth-child(7){left:86%;animation-duration:6.8s;animation-delay:2s;background:#8c50dc}
+.wave-intro-particles span:nth-child(8){left:94%;animation-duration:8.6s;animation-delay:.5s;background:var(--pro)}
+@keyframes particle-rise{
+  0%{transform:translateY(0) translateX(0);opacity:0}
+  10%{opacity:0.8}
+  90%{opacity:0.5}
+  100%{transform:translateY(-100vh) translateX(18px);opacity:0}
 }
-.wave-intro-stick span:nth-child(1){height:14px;animation-delay:0s}
-.wave-intro-stick span:nth-child(2){height:30px;animation-delay:.12s}
-.wave-intro-stick span:nth-child(3){height:44px;animation-delay:.24s}
-.wave-intro-stick span:nth-child(4){height:30px;animation-delay:.36s}
-.wave-intro-stick span:nth-child(5){height:14px;animation-delay:.48s}
-@keyframes wintro-bar{0%,100%{transform:scaleY(0.4)}50%{transform:scaleY(1)}}
+
+/* бегущие звуковые «струны» — SVG-волна, зациклена сдвигом по X (дёшево для GPU) */
+.wave-lines{
+  position:absolute;left:0;bottom:14%;width:100%;height:34%;z-index:1;
+  opacity:0.55;pointer-events:none;
+}
+.wl{fill-opacity:0.5}
+.wl-1{fill:var(--amber);animation:wl-scroll 7s linear infinite;opacity:0.5}
+.wl-2{fill:var(--pro);animation:wl-scroll 11s linear infinite reverse;opacity:0.35}
+.wl-3{fill:#8c50dc;animation:wl-scroll 15s linear infinite;opacity:0.3}
+@keyframes wl-scroll{from{transform:translateX(0)}to{transform:translateX(-100px)}}
+
+.wave-intro-core{position:relative;z-index:2;width:120px;height:120px;display:flex;align-items:center;justify-content:center}
+.sonar-ring{
+  position:absolute;inset:0;border-radius:50%;
+  border:1.5px solid var(--amber);opacity:0;
+  animation:sonar-ping 2.4s cubic-bezier(.15,.6,.4,1) infinite;
+}
+.sonar-ring.r2{animation-delay:.8s;border-color:var(--pro)}
+.sonar-ring.r3{animation-delay:1.6s;border-color:#8c50dc}
+@keyframes sonar-ping{
+  0%{transform:scale(0.35);opacity:0.65}
+  100%{transform:scale(1.9);opacity:0}
+}
 .wave-intro-ball{
-  position:relative;z-index:1;width:34px;height:34px;border-radius:50%;
+  position:relative;z-index:1;width:38px;height:38px;border-radius:50%;
   background:radial-gradient(circle at 35% 30%,#fff6df,var(--amber) 45%,#a5710f 100%);
-  box-shadow:0 0 0 0 rgba(240,180,41,0.55),0 0 26px rgba(240,180,41,0.6);
-  animation:wintro-ball-pulse 0.9s ease-in-out infinite;
+  box-shadow:0 0 0 0 rgba(240,180,41,0.55),0 0 30px rgba(240,180,41,0.65);
+  animation:wintro-ball-pulse 1.4s ease-in-out infinite;
 }
 @keyframes wintro-ball-pulse{
-  0%,100%{transform:scale(0.85);box-shadow:0 0 0 0 rgba(240,180,41,0.55),0 0 20px rgba(240,180,41,0.5)}
-  50%{transform:scale(1.15);box-shadow:0 0 0 14px rgba(240,180,41,0),0 0 32px rgba(240,180,41,0.75)}
+  0%,100%{transform:scale(0.88);box-shadow:0 0 0 0 rgba(240,180,41,0.5),0 0 22px rgba(240,180,41,0.5)}
+  50%{transform:scale(1.14);box-shadow:0 0 0 10px rgba(240,180,41,0),0 0 38px rgba(240,180,41,0.8)}
 }
-.wave-intro-text{
-  position:relative;z-index:1;
-  font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.05em;color:var(--cream);
-  text-shadow:0 4px 20px rgba(0,0,0,0.6);
-  animation:entry-in .4s cubic-bezier(.2,.9,.25,1.1) .1s backwards;
+
+.wave-intro-hint{
+  position:relative;z-index:2;
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.04em;
+  color:var(--muted);opacity:0.85;
+  animation:entry-in .4s cubic-bezier(.2,.9,.25,1.1) .2s backwards,hint-fade 3.5s ease 2s forwards;
 }
+@keyframes hint-fade{to{opacity:0.28}}
 
 /* ══════════ MODE BAR (только Pro) ══════════ */
 .mode-bar{
@@ -853,20 +896,35 @@ ul.tracks{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
 </div>
 
 <div class="wave-active-bar hidden" id="waveActiveBar">
-  <div class="wave-active-icon">🌊</div>
-  <div class="wave-mini-eq"><span></span><span></span><span></span><span></span></div>
-  <div class="wave-mini-ball"></div>
-  <div class="wave-active-text">Волна играет · <span id="waveActiveCount">0</span> треков в ротации</div>
+  <div class="wave-active-open" id="waveActiveOpen">
+    <div class="wave-active-icon">🌊</div>
+    <div class="wave-mini-eq"><span></span><span></span><span></span><span></span></div>
+    <div class="wave-mini-ball"></div>
+    <div class="wave-active-text">Волна играет · <span id="waveActiveCount">0</span> треков в ротации</div>
+  </div>
   <button class="wave-exit-btn" id="waveExitBtn">Выйти</button>
 </div>
 
 <div class="wave-intro hidden" id="waveIntro">
   <div class="wave-intro-bg"></div>
-  <div class="wave-intro-stick">
-    <span></span><span></span><span></span><span></span><span></span>
+  <div class="wave-intro-particles">
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
   </div>
-  <div class="wave-intro-ball"></div>
-  <div class="wave-intro-text">Волна пошла 🌊</div>
+
+  <svg class="wave-lines" viewBox="0 0 800 200" preserveAspectRatio="none">
+    <path class="wl wl-1" d="M0,100 C 50,40 100,160 150,100 C 200,40 250,160 300,100 C 350,40 400,160 450,100 C 500,40 550,160 600,100 C 650,40 700,160 750,100 C 800,40 850,160 900,100 L900,200 L0,200 Z"/>
+    <path class="wl wl-2" d="M0,100 C 60,150 110,50 170,100 C 230,150 280,50 340,100 C 400,150 450,50 510,100 C 570,150 620,50 680,100 C 740,150 790,50 850,100 L900,200 L0,200 Z"/>
+    <path class="wl wl-3" d="M0,100 C 40,70 90,130 140,100 C 190,70 240,130 290,100 C 340,70 390,130 440,100 C 490,70 540,130 590,100 C 640,70 690,130 740,100 C 790,70 840,130 890,100 L900,200 L0,200 Z"/>
+  </svg>
+
+  <div class="wave-intro-core">
+    <div class="sonar-ring r1"></div>
+    <div class="sonar-ring r2"></div>
+    <div class="sonar-ring r3"></div>
+    <div class="wave-intro-ball"></div>
+  </div>
+
+  <div class="wave-intro-hint" id="waveIntroHint">Дважды нажми, чтобы открыть плеер</div>
 </div>
 
 <script>
@@ -1107,7 +1165,10 @@ const waveTrackCount = document.getElementById("waveTrackCount");
 const waveStartBtn   = document.getElementById("waveStartBtn");
 const waveActiveBar  = document.getElementById("waveActiveBar");
 const waveActiveCount= document.getElementById("waveActiveCount");
+const waveActiveOpen = document.getElementById("waveActiveOpen");
 const waveExitBtn    = document.getElementById("waveExitBtn");
+const waveIntroEl    = document.getElementById("waveIntro");
+const waveIntroHint  = document.getElementById("waveIntroHint");
 
 const ICON_PLAY  = '<path d="M8 5v14l11-7z"/>';
 const ICON_PAUSE = '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
@@ -1259,14 +1320,15 @@ function startWave() {
   waveActiveCount.textContent = wavePool.length;
   if (!savedEyebrowText) savedEyebrowText = document.getElementById("sideLabel").textContent;
   document.getElementById("sideLabel").textContent = "🌊 ВОЛНА";
-  showWaveIntro();
   waveStep(true);
+  openWaveVisual();
 }
 
 function exitWave() {
   waveActive = false;
   waveChip.classList.remove("active");
   waveActiveBar.classList.add("hidden");
+  closeWaveVisual();
   if (savedEyebrowText) {
     document.getElementById("sideLabel").textContent = savedEyebrowText;
     savedEyebrowText = "";
@@ -1290,20 +1352,33 @@ function waveStep(forward) {
   }
 }
 
-// ── интро-заставка при запуске волны ──
-let waveIntroTimer = null;
-function showWaveIntro() {
-  const el = document.getElementById("waveIntro");
-  if (!el) return;
-  clearTimeout(waveIntroTimer);
-  el.classList.remove("hidden", "out");
-  void el.offsetWidth; // reflow, чтобы анимация точно перезапустилась
-  el.classList.add("go");
-  waveIntroTimer = setTimeout(() => {
-    el.classList.add("out");
-    setTimeout(() => { el.classList.add("hidden"); el.classList.remove("go","out"); }, 420);
-  }, 1050);
+// ── отдельное окно волны: остаётся открытым, пока волна активна ──
+// открывается при запуске волны и по клику на нижнюю плашку,
+// закрывается ТОЛЬКО двойным кликом/тапом по самому окну (плеер снова видно)
+function openWaveVisual() {
+  if (!waveIntroEl) return;
+  waveIntroEl.classList.remove("hidden", "out");
+  void waveIntroEl.offsetWidth; // reflow, чтобы анимация точно перезапустилась
+  waveIntroEl.classList.add("go", "open");
 }
+function closeWaveVisual() {
+  if (!waveIntroEl) return;
+  waveIntroEl.classList.remove("open");
+  waveIntroEl.classList.add("out");
+  setTimeout(() => { waveIntroEl.classList.add("hidden"); waveIntroEl.classList.remove("go","out"); }, 420);
+}
+
+if (waveIntroEl) {
+  waveIntroEl.addEventListener("dblclick", closeWaveVisual);
+  // ручное распознавание двойного тапа — на некоторых мобильных dblclick не всегда стабилен
+  let lastTapAt = 0;
+  waveIntroEl.addEventListener("touchend", () => {
+    const now = Date.now();
+    if (now - lastTapAt < 320) closeWaveVisual();
+    lastTapAt = now;
+  });
+}
+if (waveActiveOpen) waveActiveOpen.addEventListener("click", () => { if (waveActive) openWaveVisual(); });
 
 waveChip.addEventListener("click", openWaveModal);
 waveClose.addEventListener("click", closeWaveModal);
