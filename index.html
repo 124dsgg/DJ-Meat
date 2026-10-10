@@ -369,8 +369,8 @@ body.mode-pro{
   background-image:
     radial-gradient(circle at 25% 20%,rgba(240,180,41,0.4),transparent 52%),
     radial-gradient(circle at 78% 78%,rgba(224,90,40,0.32),transparent 52%),
-    radial-gradient(circle at 50% 55%,rgba(140,80,220,0.26),transparent 58%),
-    radial-gradient(circle at 85% 15%,rgba(60,180,200,0.16),transparent 45%);
+    radial-gradient(circle at 50% 55%,rgba(184,50,31,0.30),transparent 58%),
+    radial-gradient(circle at 85% 15%,rgba(143,154,46,0.16),transparent 45%);
   background-size:240% 240%,240% 240%,260% 260%,220% 220%;
   animation:wintro-bg-move 6s ease-in-out infinite;
 }
@@ -759,138 +759,175 @@ ul.tracks{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
 .info-btn:hover svg{stroke:var(--amber)}
 @media(max-width:480px){.track{gap:9px;padding:14px 8px}.tnum{width:26px;font-size:17px}.tdur{width:34px;font-size:11.5px}}
 
-/* ══════════ СТРАНИЦА ПЕСНИ ══════════ */
+/* ══════════ СТРАНИЦА ПЕСНИ — джаз 60-х (Blue Note-стиль, но в тёплой гамме) ══════════ */
 .tp{
-  position:fixed;inset:0;z-index:300;background:#0a0704;
+  position:fixed;inset:0;z-index:300;background:#150e08;
   overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
   opacity:0;transform:translateY(26px);pointer-events:none;
   transition:opacity .3s ease,transform .38s cubic-bezier(.2,.9,.25,1.1);
-  --acc:#e0a83a;--acc-rgb:224,168,58;
+  --acc:#e9a820;--acc-rgb:233,168,32;
 }
 .tp.show{opacity:1;transform:none;pointer-events:auto}
-.tp[data-album="old-money"]{--acc:#e0a83a;--acc-rgb:224,168,58}
-.tp[data-album="putaria-best"]{--acc:#e2643a;--acc-rgb:226,100,58}
-.tp[data-album="chanson"]{--acc:#a56ae8;--acc-rgb:165,106,232}
-.tp[data-album="newgen"]{--acc:#f0b429;--acc-rgb:240,180,41}
-.tp[data-album="lost-media"]{--acc:#3cb4c8;--acc-rgb:60,180,200}
+.tp[data-album="old-money"]{--acc:#e9a820;--acc-rgb:233,168,32}
+.tp[data-album="putaria-best"]{--acc:#e0561f;--acc-rgb:224,86,31}
+.tp[data-album="chanson"]{--acc:#c23b22;--acc-rgb:194,59,34}
+.tp[data-album="newgen"]{--acc:#f4c542;--acc-rgb:244,197,66}
+.tp[data-album="lost-media"]{--acc:#8f9a2e;--acc-rgb:143,154,46}
 .tp-bg{
   position:fixed;inset:0;pointer-events:none;
   background:
-    radial-gradient(circle at 50% 24%,rgba(var(--acc-rgb),0.26),transparent 54%),
-    radial-gradient(circle at 12% 92%,rgba(201,79,40,0.14),transparent 50%),
-    radial-gradient(circle at 92% 78%,rgba(140,80,220,0.14),transparent 50%);
+    radial-gradient(circle at 100% 0%,rgba(var(--acc-rgb),0.30) 0 36%,transparent 36.3%),
+    linear-gradient(to top,rgba(184,50,31,0.30),transparent 38%),
+    radial-gradient(rgba(var(--acc-rgb),0.20) 1.3px,transparent 1.8px) 0 0/15px 15px,
+    #150e08;
   transition:background .6s ease;
 }
-.tp-glow{
-  position:fixed;left:50%;top:26%;width:420px;height:420px;margin:-210px 0 0 -210px;border-radius:50%;
-  pointer-events:none;background:radial-gradient(circle,rgba(var(--acc-rgb),0.34),transparent 65%);
-  filter:blur(26px);opacity:.55;animation:tp-glow 3.4s ease-in-out infinite;animation-play-state:paused;
-}
-.tp.playing .tp-glow{animation-play-state:running}
-@keyframes tp-glow{0%,100%{transform:scale(0.85);opacity:.4}50%{transform:scale(1.15);opacity:.85}}
-.tp-particles{position:fixed;inset:0;overflow:hidden;pointer-events:none}
-.tp-particles span{
-  position:absolute;bottom:-10px;border-radius:50%;background:var(--acc);opacity:0;
-  box-shadow:0 0 8px rgba(var(--acc-rgb),0.9);
-  animation:particle-rise linear infinite;animation-play-state:paused;
-}
-.tp.playing .tp-particles span{animation-play-state:running}
-
+.tp-canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
 .tp-inner{
   position:relative;z-index:2;max-width:520px;min-height:100%;margin:0 auto;
-  padding:calc(16px + env(safe-area-inset-top,0px)) 22px calc(30px + env(safe-area-inset-bottom,0px));
+  padding:calc(16px + env(safe-area-inset-top,0px)) 22px calc(34px + env(safe-area-inset-bottom,0px));
   display:flex;flex-direction:column;align-items:center;text-align:center;
 }
 .tp-top{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .tp-back{
-  font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:0.04em;color:var(--cream);
-  background:rgba(255,255,255,0.05);border:1px solid var(--line2);border-radius:12px;padding:10px 14px;cursor:pointer;
-  transition:transform .18s ease,border-color .18s ease;
+  font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--cream);
+  background:transparent;border:2px solid var(--cream);border-radius:3px;padding:8px 12px;cursor:pointer;
+  transition:background .16s ease,color .16s ease,transform .16s ease;
 }
-.tp-back:hover{border-color:rgba(var(--acc-rgb),0.6);transform:translateX(-2px)}
+.tp-back:hover{background:var(--cream);color:#150e08}
 .tp-back:active{transform:scale(0.95)}
 .tp-album{
-  font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;
-  color:var(--acc);border:1px solid rgba(var(--acc-rgb),0.45);background:rgba(var(--acc-rgb),0.1);
-  border-radius:20px;padding:7px 12px;
+  font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;
+  color:#150e08;background:var(--acc);border-radius:3px;padding:7px 11px;
 }
-#tpHeart{width:38px;height:38px}
-#tpHeart svg{width:16px;height:16px}
+#tpHeart{width:38px;height:38px;border:2px solid var(--cream);background:transparent;border-radius:3px}
+#tpHeart svg{width:16px;height:16px;stroke:var(--cream)}
+#tpHeart.liked{background:var(--acc);border-color:var(--acc)}
+#tpHeart.liked svg{fill:#150e08;stroke:#150e08}
 
-.tp-stage{position:relative;width:min(66vw,280px);aspect-ratio:1/1;margin:26px auto 20px;flex-shrink:0}
-.tp-rings i{
-  position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(var(--acc-rgb),0.7);opacity:0;
-  animation:tp-ring 3.3s cubic-bezier(.15,.6,.4,1) infinite;animation-play-state:paused;
+.tp-side{
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;
+  color:var(--acc);margin:18px 0 0;opacity:.9;
 }
-.tp-rings i:nth-child(2){animation-delay:1.1s}
-.tp-rings i:nth-child(3){animation-delay:2.2s}
-.tp.playing .tp-rings i{animation-play-state:running}
-@keyframes tp-ring{0%{transform:scale(0.95);opacity:0.7}100%{transform:scale(1.65);opacity:0}}
+.tp-stage{position:relative;width:min(70vw,290px);aspect-ratio:1/1;margin:14px auto 24px;flex-shrink:0}
+.tp-sleeve{
+  position:absolute;inset:0;background:var(--acc);border:3px solid #0d0804;
+  box-shadow:9px 9px 0 var(--cream),9px 9px 0 3px #0d0804;
+  background-image:radial-gradient(rgba(0,0,0,0.24) 1.4px,transparent 1.9px);background-size:10px 10px;
+  transition:background-color .5s ease;
+}
+.tp-sleeve::after{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:16%;background:#0d0804;opacity:.88;
+}
+.tp-vwrap{position:absolute;inset:7%;will-change:transform}
 .tp-vinyl{
   position:absolute;inset:0;border-radius:50%;
-  background:repeating-conic-gradient(from 0deg,#251b0e 0deg 2.4deg,#150e07 2.4deg 4.8deg);
-  border:3px solid #3a2c17;
-  box-shadow:0 0 0 1px rgba(0,0,0,0.5),0 26px 60px -14px rgba(0,0,0,0.85),0 0 46px -10px rgba(var(--acc-rgb),0.5);
-  animation:vinylspin 4.5s linear infinite;animation-play-state:paused;
+  background:repeating-conic-gradient(from 0deg,#1f160b 0deg 2.4deg,#0f0904 2.4deg 4.8deg);
+  border:2px solid #000;box-shadow:0 10px 26px -8px rgba(0,0,0,0.8);
+  animation:vinylspin 4.2s linear infinite;animation-play-state:paused;
 }
 .tp.playing .tp-vinyl{animation-play-state:running}
 .tp-vinyl::before{
   content:'';position:absolute;inset:0;border-radius:50%;
   background:
-    radial-gradient(circle,transparent 0 36%,rgba(0,0,0,0.4) 36.5% 37%,transparent 37.5%),
-    radial-gradient(circle,transparent 0 50%,rgba(0,0,0,0.3) 50.5% 51%,transparent 51.5%),
-    radial-gradient(circle,transparent 0 64%,rgba(0,0,0,0.25) 64.5% 65%,transparent 65.5%),
-    conic-gradient(from 0deg,transparent 0 16%,rgba(255,255,255,0.14) 22%,transparent 28% 66%,rgba(255,255,255,0.09) 72%,transparent 78%);
+    radial-gradient(circle,transparent 0 38%,rgba(0,0,0,0.5) 38.5% 39%,transparent 39.5%),
+    radial-gradient(circle,transparent 0 52%,rgba(0,0,0,0.4) 52.5% 53%,transparent 53.5%),
+    radial-gradient(circle,transparent 0 66%,rgba(0,0,0,0.3) 66.5% 67%,transparent 67.5%),
+    conic-gradient(from 0deg,transparent 0 14%,rgba(255,255,255,0.15) 20%,transparent 26% 64%,rgba(255,255,255,0.10) 70%,transparent 76%);
 }
 .tp-label{
-  position:absolute;left:50%;top:50%;width:36%;height:36%;margin:-18% 0 0 -18%;border-radius:50%;
-  background:radial-gradient(circle,#0a0805 0 6%,var(--acc) 6.5% 100%);
-  box-shadow:inset 0 0 14px rgba(0,0,0,0.45);
+  position:absolute;left:50%;top:50%;width:35%;height:35%;margin:-17.5% 0 0 -17.5%;border-radius:50%;
+  background:radial-gradient(circle,#0d0804 0 7%,var(--cream) 7.5% 78%,#0d0804 79% 84%,var(--acc) 84.5% 100%);
 }
-.tp-label::after{
-  content:'';position:absolute;left:50%;top:12%;width:9%;height:9%;margin-left:-4.5%;border-radius:50%;background:#120c06;
-}
-
-.tp-eq{display:flex;align-items:flex-end;justify-content:center;gap:4px;height:44px;width:100%;margin:2px 0 16px}
-.tp-eq span{
-  display:block;width:4px;height:100%;border-radius:2px;transform-origin:bottom;transform:scaleY(0.12);
-  background:linear-gradient(to top,var(--acc),rgba(255,255,255,0.55));
-  animation:tp-eq var(--dur,0.9s) ease-in-out infinite;animation-delay:var(--dl,0s);animation-play-state:paused;
-}
-.tp.playing .tp-eq span{animation-play-state:running}
-@keyframes tp-eq{0%,100%{transform:scaleY(0.14)}50%{transform:scaleY(var(--h,0.8))}}
+.tp-label::after{content:'';position:absolute;left:50%;top:13%;width:9%;height:9%;margin-left:-4.5%;border-radius:50%;background:#0d0804}
 
 .tp-title{
-  font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,10.5vw,54px);line-height:1.03;letter-spacing:0.04em;
-  margin:0 0 8px;max-width:100%;overflow-wrap:anywhere;word-break:break-word;
-  background:linear-gradient(120deg,var(--cream) 0%,var(--acc) 45%,var(--cream) 80%);
-  background-size:240% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-  animation:name-shine 4s linear infinite;
+  font-family:'Bebas Neue',sans-serif;font-size:clamp(38px,11.5vw,60px);line-height:0.98;letter-spacing:0.03em;
+  text-transform:uppercase;color:var(--cream);margin:4px 0 12px;max-width:100%;
+  overflow-wrap:anywhere;word-break:break-word;
+  --sh:3px;text-shadow:var(--sh) var(--sh) 0 var(--acc);
 }
-.tp-title.swap,.tp-artist.swap{animation:tp-swap .45s cubic-bezier(.2,.9,.25,1.2),name-shine 4s linear infinite}
+.tp-title.swap{animation:tp-swap .45s cubic-bezier(.2,.9,.25,1.2)}
 .tp-artist.swap{animation:tp-swap .45s cubic-bezier(.2,.9,.25,1.2) .06s backwards}
 @keyframes tp-swap{from{opacity:0;transform:translateY(10px) scale(0.98)}to{opacity:1;transform:none}}
-.tp-artist{font-size:15px;font-weight:600;color:var(--acc);margin-bottom:14px}
-.tp-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-bottom:22px}
-.tp-chip{
-  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.05em;color:var(--cream);
-  background:rgba(255,255,255,0.05);border:1px solid var(--line2);border-radius:10px;padding:6px 11px;
+.tp-artist{
+  font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--acc);margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:10px;max-width:100%;
 }
-.tp-chip.pro{color:#1a1208;background:linear-gradient(120deg,var(--pro),#ffd873);border-color:transparent;font-weight:700}
+.tp-artist::before,.tp-artist::after{content:'';width:26px;height:2px;background:var(--acc);flex-shrink:0}
+.tp-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-bottom:14px}
+.tp-chip{
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.06em;color:var(--cream);
+  border:2px solid var(--cream);border-radius:3px;padding:5px 10px;background:transparent;
+}
+.tp-chip.pro{color:#150e08;background:var(--pro);border-color:var(--pro);font-weight:700}
+.tp-spec{width:100%;height:68px;display:block;margin:2px 0 16px}
 
-.tp-seek{width:100%;display:flex;flex-direction:column;gap:6px}
-.tp-seek .row{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted)}
-.tp-seek input[type=range]{height:4px}
-.tp-seek input[type=range]::-webkit-slider-thumb{background:var(--acc);box-shadow:0 0 0 3px rgba(var(--acc-rgb),0.25)}
-.tp-transport{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:20px}
-.tp-transport button.ctrl{width:48px;height:48px}
+.tp-seek{width:100%;display:flex;flex-direction:column;gap:7px}
+.tp-seek input[type=range]{
+  height:8px;border-radius:2px;
+  background:linear-gradient(to right,var(--acc) var(--p,0%),rgba(242,228,196,0.18) var(--p,0%));
+}
+.tp-seek input[type=range]::-webkit-slider-thumb{width:9px;height:22px;border-radius:2px;background:var(--cream);box-shadow:0 0 0 2px #0d0804}
+.tp-seek .row{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--cream);opacity:.8}
+.tp-transport{display:flex;align-items:center;justify-content:center;gap:20px;margin-top:20px}
+.tp-transport button.ctrl{width:48px;height:48px;background:transparent;border:2px solid var(--cream)}
+.tp-transport button.ctrl:hover{background:rgba(242,228,196,0.12)}
 .tp-transport button.ctrl svg{width:17px;height:17px}
 button.tp-play{
-  width:68px!important;height:68px!important;background:var(--acc)!important;border-color:var(--acc)!important;
-  box-shadow:0 0 26px rgba(var(--acc-rgb),0.45);
+  width:70px!important;height:70px!important;background:var(--acc)!important;border-color:#0d0804!important;
+  box-shadow:4px 4px 0 var(--cream);animation:none!important;
 }
-button.tp-play svg{fill:#0e0b07!important;width:22px!important;height:22px!important}
-@media(prefers-reduced-motion:reduce){.tp-title{animation:none}}
+button.tp-play svg{fill:#0d0804!important;width:23px!important;height:23px!important}
+.tp-lyr-btn{
+  margin-top:26px;width:100%;max-width:320px;padding:14px;cursor:pointer;
+  font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--cream);background:transparent;border:2px solid var(--cream);border-radius:3px;
+  box-shadow:4px 4px 0 var(--acc);
+  transition:transform .15s ease,box-shadow .15s ease,background .15s ease,color .15s ease;
+}
+.tp-lyr-btn:hover{background:var(--cream);color:#150e08}
+.tp-lyr-btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--acc)}
+
+/* ── лист с текстом песни ── */
+.tp-lyrics{
+  position:fixed;inset:0;z-index:320;background:#120b06;
+  --acc:#e9a820;--acc-rgb:233,168,32;
+  display:flex;flex-direction:column;transform:translateY(100%);visibility:hidden;
+  transition:transform .42s cubic-bezier(.2,.9,.25,1.05),visibility 0s linear .42s;
+  background-image:radial-gradient(rgba(var(--acc-rgb),0.13) 1.3px,transparent 1.8px);background-size:15px 15px;
+}
+.tp-lyrics.show{transform:none;visibility:visible;transition:transform .42s cubic-bezier(.2,.9,.25,1.05),visibility 0s}
+.tp-lyrics[data-album="putaria-best"]{--acc:#e0561f;--acc-rgb:224,86,31}
+.tp-lyrics[data-album="chanson"]{--acc:#c23b22;--acc-rgb:194,59,34}
+.tp-lyrics[data-album="newgen"]{--acc:#f4c542;--acc-rgb:244,197,66}
+.tp-lyrics[data-album="lost-media"]{--acc:#8f9a2e;--acc-rgb:143,154,46}
+.lyr-head{
+  padding:calc(16px + env(safe-area-inset-top,0px)) 20px 14px;border-bottom:3px solid var(--acc);
+  display:flex;flex-direction:column;gap:12px;background:rgba(18,11,6,0.92);
+}
+.lyr-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,8vw,40px);line-height:1;letter-spacing:0.04em;color:var(--cream);text-transform:uppercase;overflow-wrap:anywhere;text-shadow:3px 3px 0 var(--acc)}
+.lyr-body{
+  flex:1;overflow-y:auto;overscroll-behavior:contain;padding:22px 22px calc(40px + env(safe-area-inset-bottom,0px));
+  max-width:560px;width:100%;margin:0 auto;
+  font-size:17px;line-height:1.8;color:var(--cream);white-space:pre-wrap;overflow-wrap:anywhere;
+  border-left:4px solid var(--acc);margin-left:max(0px,calc((100% - 560px)/2));
+}
+.lyr-body.dim{opacity:.55;font-family:'JetBrains Mono',monospace;font-size:13px}
+.lyr-empty{text-align:center;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.8;padding-top:40px;white-space:normal}
+.lyr-empty b{display:block;font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.08em;color:var(--acc);font-weight:400;margin-bottom:6px}
+
+/* ══════════ ЭКРАН ВОЛНЫ — холст с реакцией на звук ══════════ */
+.wave-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.wave-intro-bg{will-change:transform;transform-origin:50% 45%}
+.wave-now{position:absolute;left:0;right:0;top:calc(24px + env(safe-area-inset-top,0px));z-index:3;text-align:center;padding:0 22px;pointer-events:none}
+.wave-now-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.32em;color:var(--amber);margin-bottom:8px}
+.wave-now-title{
+  font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,9vw,46px);line-height:1.05;letter-spacing:0.04em;color:var(--cream);
+  overflow-wrap:anywhere;text-shadow:0 0 26px rgba(233,168,32,0.55);
+}
+.wave-now-artist{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.wave-intro .wave-intro-hint{position:absolute;left:0;right:0;bottom:calc(22px + env(safe-area-inset-bottom,0px));text-align:center;z-index:3}
 </style>
 </head>
 <body>
@@ -1052,32 +1089,20 @@ button.tp-play svg{fill:#0e0b07!important;width:22px!important;height:22px!impor
 </div>
 
 <div class="wave-intro hidden" id="waveIntro">
-  <div class="wave-intro-bg"></div>
-  <div class="wave-intro-particles">
-    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+  <div class="wave-intro-bg" id="waveBg"></div>
+  <canvas class="wave-canvas" id="waveCanvas"></canvas>
+  <div class="wave-now">
+    <div class="wave-now-label">🌊 ВОЛНА</div>
+    <div class="wave-now-title" id="waveNowTitle">—</div>
+    <div class="wave-now-artist" id="waveNowArtist"></div>
   </div>
-
-  <svg class="wave-lines" viewBox="0 0 800 200" preserveAspectRatio="none">
-    <path class="wl wl-1" d="M0,100 C 50,40 100,160 150,100 C 200,40 250,160 300,100 C 350,40 400,160 450,100 C 500,40 550,160 600,100 C 650,40 700,160 750,100 C 800,40 850,160 900,100 L900,200 L0,200 Z"/>
-    <path class="wl wl-2" d="M0,100 C 60,150 110,50 170,100 C 230,150 280,50 340,100 C 400,150 450,50 510,100 C 570,150 620,50 680,100 C 740,150 790,50 850,100 L900,200 L0,200 Z"/>
-    <path class="wl wl-3" d="M0,100 C 40,70 90,130 140,100 C 190,70 240,130 290,100 C 340,70 390,130 440,100 C 490,70 540,130 590,100 C 640,70 690,130 740,100 C 790,70 840,130 890,100 L900,200 L0,200 Z"/>
-  </svg>
-
-  <div class="wave-intro-core">
-    <div class="sonar-ring r1"></div>
-    <div class="sonar-ring r2"></div>
-    <div class="sonar-ring r3"></div>
-    <div class="wave-intro-ball"></div>
-  </div>
-
   <div class="wave-intro-hint" id="waveIntroHint">Дважды нажми, чтобы открыть плеер</div>
 </div>
 
 <!-- ══════════ СТРАНИЦА ПЕСНИ ══════════ -->
 <div class="tp hidden" id="trackPage" data-album="all">
   <div class="tp-bg"></div>
-  <div class="tp-glow"></div>
-  <div class="tp-particles" id="tpParticles"></div>
+  <canvas class="tp-canvas" id="tpBgCanvas"></canvas>
   <div class="tp-inner">
     <div class="tp-top">
       <button class="tp-back" id="tpBack">← Назад</button>
@@ -1085,16 +1110,19 @@ button.tp-play svg{fill:#0e0b07!important;width:22px!important;height:22px!impor
       <button class="heart-btn" id="tpHeart"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-10-9C.4 8.6 2 5 5.5 5 8 5 9.6 6.8 12 9.5 14.4 6.8 16 5 18.5 5 22 5 23.6 8.6 22 12c-2.5 4.4-10 9-10 9z"/></svg></button>
     </div>
 
-    <div class="tp-stage">
-      <div class="tp-rings"><i></i><i></i><i></i></div>
-      <div class="tp-vinyl"><div class="tp-label"></div></div>
+    <div class="tp-side">Side A · Stereo · 33⅓ RPM</div>
+    <div class="tp-stage" id="tpStage">
+      <div class="tp-sleeve"></div>
+      <div class="tp-vwrap" id="tpVinylWrap">
+        <div class="tp-vinyl"><div class="tp-label"></div></div>
+      </div>
     </div>
-
-    <div class="tp-eq" id="tpEq"></div>
 
     <h2 class="tp-title" id="tpTitle">—</h2>
     <div class="tp-artist" id="tpArtist">—</div>
     <div class="tp-meta" id="tpMeta"></div>
+
+    <canvas class="tp-spec" id="tpSpec"></canvas>
 
     <div class="tp-seek">
       <input type="range" id="tpProgress" min="0" max="100" value="0" step="0.1">
@@ -1106,7 +1134,17 @@ button.tp-play svg{fill:#0e0b07!important;width:22px!important;height:22px!impor
       <button class="ctrl tp-play" id="tpPlay"><svg id="tpPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
       <button class="ctrl" id="tpNext"><svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM4 6v12l11-6z"/></svg></button>
     </div>
+
+    <button class="tp-lyr-btn" id="tpLyrBtn">♪ Текст песни</button>
   </div>
+</div>
+
+<div class="tp-lyrics" id="lyricsSheet" data-album="all">
+  <div class="lyr-head">
+    <button class="tp-back" id="lyrBack" style="align-self:flex-start">← К плееру</button>
+    <div class="lyr-title" id="lyrTitle">—</div>
+  </div>
+  <div class="lyr-body" id="lyrBody"></div>
 </div>
 
 <script>
@@ -1142,11 +1180,11 @@ const ALL_TRACKS = [
   {n:26, title:"Флирт",                        artist:"DJ Мясо",    album:"chanson",      tier:"pro",  file:"songs/26.mp3"},
   {n:27, title:"Сталкер",                      artist:"DJ Путария", album:"newgen",       tier:"pro",  file:"songs/27.mp3"},
   {n:28, title:"Планета обезьян",              artist:"DJ Путария", album:"putaria-best", tier:"lite", file:"songs/28.mp3"},
-  {n:29, title:"Картель",                      artist:"DJ Путария", album:"lost-media",   tier:"lite", file:"songs/29.mp3"},
+  {n:29, title:"Картель",                      artist:"DJ Путария", album:"lost-media",   tier:"pro", file:"songs/29.mp3"},
   {n:30, title:"Шапакляки",                    artist:"DJ Путария", album:"lost-media",   tier:"lite", file:"songs/30.mp3"},
   {n:31, title:"Гунер",                        artist:"DJ Путария", album:"lost-media",   tier:"lite", file:"songs/31.mp3"},
   {n:32, title:"Шалтай-Балтай",                artist:"DJ Мясо",    album:"lost-media",   tier:"lite", file:"songs/32.mp3"},
-  {n:33, title:"Сад плачущей химеры",          artist:"DJ Путария", album:"lost-media",   tier:"lite", file:"songs/33.mp3"},
+  {n:33, title:"Сад плачущей химеры",          artist:"DJ Путария", album:"lost-media",   tier:"pro", file:"songs/33.mp3"},
 ];
 
 const ALBUM_META = {
@@ -1362,6 +1400,7 @@ const waveIntroHint  = document.getElementById("waveIntroHint");
 
 const INFO_SVG   = '<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg>';
 let trackPageOpen = false;
+let waveVisualOn = false;
 const ICON_PLAY  = '<path d="M8 5v14l11-7z"/>';
 const ICON_PAUSE = '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
 const EQ         = '<div class="eq"><span></span><span></span><span></span></div>';
@@ -1558,10 +1597,12 @@ function openWaveVisual() {
   waveIntroEl.classList.remove("hidden", "out");
   void waveIntroEl.offsetWidth; // reflow, чтобы анимация точно перезапустилась
   waveIntroEl.classList.add("go", "open");
+  waveVisualOn = true; refreshWaveNow(); vizKick();
 }
 function closeWaveVisual() {
   if (!waveIntroEl) return;
   waveIntroEl.classList.remove("open");
+  waveVisualOn = false;
   waveIntroEl.classList.add("out");
   setTimeout(() => { waveIntroEl.classList.add("hidden"); waveIntroEl.classList.remove("go","out"); }, 420);
 }
@@ -1739,6 +1780,7 @@ function loadByN(n, autoplay) {
   updateTrackStates(); // список уже на месте — просто помечаем нужную строку активной
   updateMediaSession(t);
   refreshTrackPage();
+  refreshWaveNow();
   if (autoplay) audio.play().catch(()=>{});
 }
 
@@ -1937,7 +1979,233 @@ if (isProSaved()) { /* кнопка "Слушать" сама поймёт пр�
 syncProCloud(() => { try { localStorage.setItem(PRO_KEY,"1"); } catch(e) {} });
 
 // ═══════════════════════════════════════════════════
-// СТРАНИЦА ПЕСНИ — большое название, крутящаяся пластинка, эффекты
+// АНАЛИЗ ЗВУКА — реальные басы/средние/высокие из играющего трека.
+// Берём звук через captureStream() — он НЕ вмешивается в само воспроизведение
+// (не глушит звук и не ломает фон/экран блокировки). Если браузер не умеет
+// captureStream (часть iOS) или файл с чужого домена — включается
+// имитация ритма, чтобы эффекты всё равно жили.
+// ═══════════════════════════════════════════════════
+let analyser = null, anSrc = null, anBuf = null, anTime = null;
+let anLive = false, anFailed = false, anZeroFrames = 0;
+
+function connectAnalyser() {
+  if (anFailed) return;
+  try {
+    const ctx = getAudioCtx();
+    const cap = audio.captureStream || audio.mozCaptureStream;
+    if (!ctx || !cap) { anFailed = true; return; }
+    const stream = cap.call(audio);
+    if (!stream || !stream.getAudioTracks().length) return; // попробуем при следующем playing
+    if (!analyser) {
+      analyser = ctx.createAnalyser();
+      analyser.fftSize = 1024;
+      analyser.smoothingTimeConstant = 0.7;
+      analyser.minDecibels = -85;
+      analyser.maxDecibels = -25;
+      anBuf  = new Uint8Array(analyser.frequencyBinCount);
+      anTime = new Uint8Array(analyser.fftSize);
+    }
+    if (anSrc) { try { anSrc.disconnect(); } catch(e) {} }
+    anSrc = ctx.createMediaStreamSource(stream); // к динамикам НЕ подключаем — только к анализатору
+    anSrc.connect(analyser);
+    anLive = true; anZeroFrames = 0;
+  } catch (e) { anFailed = true; anLive = false; }
+}
+audio.addEventListener("play",    () => { try { getAudioCtx(); } catch(e) {} });
+audio.addEventListener("playing", connectAnalyser);
+
+const V = { bass:0, mid:0, high:0, energy:0, beat:0, hit:false, spec:new Uint8Array(512), wave:new Uint8Array(1024) };
+let lastBeatAt = 0, bassAvg = 0.2;
+
+function simulateAudio(now) {
+  const t = now / 1000, ph = (t * 2.05) % 1, kick = Math.exp(-ph * 5.5), hat = Math.exp(-((t * 4.1) % 1) * 9);
+  for (let i = 0; i < 512; i++) {
+    const lo = Math.exp(-i / 9) * (0.35 + 0.65 * kick);
+    const md = Math.exp(-i / 70) * (0.35 + 0.25 * Math.sin(t * 2.7 + i * 0.21));
+    const hi = 0.22 * hat * Math.exp(-i / 260);
+    V.spec[i] = Math.max(0, Math.min(255, (lo * 0.95 + md * 0.55 + hi + Math.random() * 0.05) * 230));
+  }
+  for (let i = 0; i < 1024; i++) {
+    const x = i / 1024;
+    V.wave[i] = 128 + 60 * Math.sin(x * 18.85 + t * 9) * (0.4 + kick * 0.6) + 25 * Math.sin(x * 69 - t * 13) + (Math.random() - 0.5) * 8;
+  }
+}
+function avgBins(a, b) { let sum = 0; for (let i = a; i < b; i++) sum += V.spec[i]; return sum / ((b - a) * 255); }
+
+function vizSample(now) {
+  V.hit = false;
+  let real = false;
+  if (anLive && analyser) {
+    analyser.getByteFrequencyData(anBuf);
+    analyser.getByteTimeDomainData(anTime);
+    let sum = 0; for (let i = 0; i < anBuf.length; i++) sum += anBuf[i];
+    if (sum > 0) { real = true; anZeroFrames = 0; V.spec.set(anBuf); V.wave.set(anTime); }
+    else if (isPlaying) anZeroFrames++;
+  }
+  if (!real) {
+    if (isPlaying && (!anLive || anZeroFrames > 90)) simulateAudio(now);
+    else { for (let i = 0; i < 512; i++) V.spec[i] *= 0.9; for (let i = 0; i < 1024; i++) V.wave[i] = 128 + (V.wave[i] - 128) * 0.9; }
+  }
+  const rb = avgBins(1, 7), rm = avgBins(7, 41), rh = avgBins(41, 200);
+  V.bass = Math.max(rb, V.bass * 0.86);
+  V.mid  = Math.max(rm, V.mid  * 0.88);
+  V.high = Math.max(rh, V.high * 0.90);
+  V.energy = (V.bass + V.mid + V.high) / 3;
+  bassAvg = bassAvg * 0.96 + rb * 0.04;
+  if (isPlaying && rb > 0.36 && rb > bassAvg * 1.28 && now - lastBeatAt > 230) { lastBeatAt = now; V.beat = 1; V.hit = true; }
+  V.beat *= 0.9;
+}
+
+let vizRaf = 0, vizLast = 0;
+function vizKick() { if (!vizRaf) vizRaf = requestAnimationFrame(vizFrame); }
+function vizFrame(now) {
+  vizRaf = 0;
+  const wantTp = trackPageOpen, wantWave = waveVisualOn;
+  if (!(wantTp || wantWave) || document.hidden) return;
+  const dt = Math.min(0.05, (now - vizLast) / 1000 || 0.016); vizLast = now;
+  vizSample(now);
+  if (wantWave) drawWaveScreen(now, dt);
+  if (wantTp) drawTp(now, dt);
+  vizRaf = requestAnimationFrame(vizFrame);
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) vizKick(); });
+function sizeCv(cv, w, h) { if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; } }
+
+// ═══════════════════════════════════════════════════
+// ЭКРАН ВОЛНЫ — большой холст: волны прыгают от басов, спектр-кольцо,
+// ударные кольца, взрывы частиц, осциллограф, «шторка» из высоких
+// ═══════════════════════════════════════════════════
+const waveCv = document.getElementById("waveCanvas");
+const waveG  = waveCv.getContext("2d");
+const waveBgEl = document.getElementById("waveBg");
+const waveNowTitle  = document.getElementById("waveNowTitle");
+const waveNowArtist = document.getElementById("waveNowArtist");
+const WAVE_COLS = ["233,168,32","224,86,31","184,50,31","242,228,196","143,154,46"];
+const RAD_N = 72;
+const radCols = [];
+for (let i = 0; i < RAD_N; i++) { const t = i / RAD_N; radCols.push(`hsl(${8 + Math.abs(Math.sin(t * Math.PI)) * 40},92%,${52 + t * 8}%)`); }
+let wParts = [], wRings = [];
+
+function refreshWaveNow() {
+  const t = ALL_TRACKS.find(x => x.n === currentTrackN);
+  if (!t) return;
+  waveNowTitle.textContent = t.title;
+  waveNowArtist.textContent = t.artist + " · " + (ALBUM_META[t.album] ? ALBUM_META[t.album].label : "");
+}
+
+function drawWaveScreen(now, dt) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  const W = Math.round(innerWidth * dpr), H = Math.round(innerHeight * dpr);
+  sizeCv(waveCv, W, H);
+  const g = waveG, f = dt * 60;
+
+  // шлейф: стираем часть прошлого кадра, а не весь
+  g.globalCompositeOperation = "destination-out";
+  g.fillStyle = "rgba(0,0,0," + (0.30 - V.bass * 0.12).toFixed(3) + ")";
+  g.fillRect(0, 0, W, H);
+  g.globalCompositeOperation = "lighter";
+
+  const cx = W / 2, cy = H * 0.42, R0 = Math.min(W, H) * 0.13;
+  const pr = R0 * (0.6 + V.bass * 0.55);
+
+  // вспышка на ударе
+  if (V.beat > 0.5) { g.fillStyle = `rgba(233,168,32,${(V.beat * 0.07).toFixed(3)})`; g.fillRect(0, 0, W, H); }
+
+  // «шторка» сверху — реагирует на высокие
+  const cn = 56, cw = W / cn;
+  for (let i = 0; i < cn; i++) {
+    const v = V.spec[40 + ((i / cn) * 230 | 0)] / 255;
+    const len = H * (0.02 + v * v * 0.22 + V.high * 0.05);
+    g.fillStyle = `rgba(224,86,31,${(0.2 + v * 0.5).toFixed(3)})`;
+    g.fillRect(i * cw + cw * 0.28, 0, cw * 0.44, len);
+    g.fillStyle = `rgba(242,228,196,${(0.3 + v * 0.6).toFixed(3)})`;
+    g.fillRect(i * cw + cw * 0.28, len, cw * 0.44, 3 * dpr);
+  }
+
+  // пять слоёв волн: басы поднимают левую часть, высокие — правую
+  const step = 14 * dpr, nPts = Math.ceil(W / step) + 1, ys = new Float32Array(nPts);
+  for (let k = 0; k < 5; k++) {
+    const col = WAVE_COLS[k];
+    const base = H * (0.86 - k * 0.045);
+    const amp = H * (0.018 + V.bass * 0.075 * (1 - k * 0.14) + V.mid * 0.03);
+    const freq = 1.6 + k * 0.55, sp = now * 0.001 * (0.7 + k * 0.35) * (k % 2 ? -1 : 1);
+    for (let n = 0; n < nPts; n++) {
+      const sx = Math.min(1, (n * step) / W);
+      const bump = V.spec[1 + ((Math.pow(sx, 1.8) * 190) | 0)] / 255;
+      ys[n] = base - Math.sin(sx * Math.PI * freq * 2 + sp * 3) * amp - Math.sin(sx * Math.PI * freq * 3.3 - sp * 2) * amp * 0.45 - bump * H * 0.07 * (1 - k * 0.15);
+    }
+    g.beginPath(); g.moveTo(0, H);
+    for (let n = 0; n < nPts; n++) g.lineTo(n * step, ys[n]);
+    g.lineTo(W, H); g.closePath();
+    g.fillStyle = `rgba(${col},${(0.15 + V.bass * 0.10).toFixed(3)})`; g.fill();
+    g.beginPath();
+    for (let n = 0; n < nPts; n++) n ? g.lineTo(n * step, ys[n]) : g.moveTo(0, ys[0]);
+    g.lineWidth = 2 * dpr; g.strokeStyle = `rgba(${col},0.55)`; g.stroke();
+  }
+
+  // осциллограф (настоящая форма сигнала)
+  const sy = H * 0.64, sa = H * (0.05 + V.energy * 0.16);
+  g.lineJoin = "round";
+  for (let pass = 0; pass < 2; pass++) {
+    g.beginPath();
+    for (let i = 0; i < 1024; i += 4) {
+      const x = i / 1023 * W, y = sy + ((V.wave[i] - 128) / 128) * sa;
+      i ? g.lineTo(x, y) : g.moveTo(x, y);
+    }
+    g.lineWidth = (pass ? 3.2 : 10) * dpr;
+    g.strokeStyle = `rgba(242,228,196,${pass ? 0.6 : 0.10})`;
+    g.stroke();
+  }
+
+  // ядро: пульсирует от баса
+  let gr = g.createRadialGradient(cx, cy, 0, cx, cy, pr * 2.4);
+  gr.addColorStop(0, "rgba(255,240,205,0.95)"); gr.addColorStop(0.25, "rgba(233,168,32,0.55)");
+  gr.addColorStop(0.6, "rgba(224,86,31,0.18)"); gr.addColorStop(1, "rgba(224,86,31,0)");
+  g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, pr * 2.4, 0, 6.2832); g.fill();
+
+  // круговой спектр, симметричный, медленно вращается
+  const rot = now * 0.00018;
+  g.lineCap = "round"; g.lineWidth = Math.max(2, R0 * 0.07);
+  for (let i = 0; i < RAD_N; i++) {
+    const j = i < 36 ? i : 71 - i;
+    const v = V.spec[2 + ((Math.pow(j / 36, 1.5) * 170) | 0)] / 255;
+    const a = rot + i / RAD_N * 6.2832, r1 = pr * 1.35, r2 = r1 + R0 * (0.12 + v * v * 1.5) * (0.8 + V.bass * 0.6);
+    g.globalAlpha = 0.55 + v * 0.45; g.strokeStyle = radCols[i];
+    g.beginPath(); g.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1); g.lineTo(cx + Math.cos(a) * r2, cy + Math.sin(a) * r2); g.stroke();
+  }
+  g.globalAlpha = 1;
+
+  // удар: кольца + взрыв частиц
+  if (V.hit) {
+    wRings.push({ r: pr * 1.3, a: 0.85 }); wRings.push({ r: pr * 1.0, a: 0.6 });
+    const n = 10 + ((V.bass * 22) | 0);
+    for (let i = 0; i < n; i++) {
+      const an = Math.random() * 6.2832, sp = (2 + Math.random() * 6) * dpr;
+      wParts.push({ x: cx, y: cy, vx: Math.cos(an) * sp, vy: Math.sin(an) * sp, life: 1, sz: (1.5 + Math.random() * 3) * dpr, col: WAVE_COLS[(Math.random() * 4) | 0] });
+    }
+  }
+  if (Math.random() < 0.3) wParts.push({ x: Math.random() * W, y: H + 6, vx: (Math.random() - 0.5) * 0.4 * dpr, vy: -(0.6 + Math.random() * 1.6) * dpr, life: 1.2, sz: (1 + Math.random() * 2.5) * dpr, col: WAVE_COLS[(Math.random() * 5) | 0] });
+  if (wParts.length > 260) wParts.splice(0, wParts.length - 260);
+
+  for (let i = wRings.length - 1; i >= 0; i--) {
+    const r = wRings[i]; r.r += (3 + V.bass * 5) * dpr * f; r.a -= 0.013 * f;
+    if (r.a <= 0) { wRings.splice(i, 1); continue; }
+    g.beginPath(); g.arc(cx, cy, r.r, 0, 6.2832); g.lineWidth = 3.5 * dpr; g.strokeStyle = `rgba(242,200,110,${r.a.toFixed(3)})`; g.stroke();
+  }
+  for (let i = wParts.length - 1; i >= 0; i--) {
+    const p = wParts[i]; p.x += p.vx * f; p.y += p.vy * f; p.vx *= 0.985; p.life -= 0.012 * f;
+    if (p.life <= 0) { wParts.splice(i, 1); continue; }
+    g.fillStyle = `rgba(${p.col},${Math.min(1, p.life).toFixed(3)})`;
+    g.beginPath(); g.arc(p.x, p.y, p.sz, 0, 6.2832); g.fill();
+  }
+
+  g.globalCompositeOperation = "source-over";
+  waveBgEl.style.transform = `scale(${(1 + V.bass * 0.05).toFixed(3)})`;
+}
+
+// ═══════════════════════════════════════════════════
+// СТРАНИЦА ПЕСНИ — джаз 60-х: обложка-конверт, пластинка, спектр-столбики,
+// волны на фоне и кольца от пластинки на каждом ударе
 // ═══════════════════════════════════════════════════
 const trackPageEl = document.getElementById("trackPage");
 const tpTitle     = document.getElementById("tpTitle");
@@ -1949,39 +2217,85 @@ const tpProgress  = document.getElementById("tpProgress");
 const tpCur       = document.getElementById("tpCur");
 const tpDur       = document.getElementById("tpDur");
 const tpPlayIcon  = document.getElementById("tpPlayIcon");
+const tpBgCv      = document.getElementById("tpBgCanvas");
+const tpBgG       = tpBgCv.getContext("2d");
+const tpSpecCv    = document.getElementById("tpSpec");
+const tpSpecG     = tpSpecCv.getContext("2d");
+const tpStage     = document.getElementById("tpStage");
+const tpVinylWrap = document.getElementById("tpVinylWrap");
+const ALBUM_ACC = {
+  "all":[233,168,32], "old-money":[233,168,32], "putaria-best":[224,86,31],
+  "chanson":[194,59,34], "newgen":[244,197,66], "lost-media":[143,154,46]
+};
+const TP_COLS = ["233,168,32","224,86,31","242,228,196"];
+let tpRings = [], tpPeaks = new Float32Array(40);
 
-// эквалайзер и частицы — генерируем один раз, анимируются только пока трек играет
-(function buildTpEffects() {
-  const eq = document.getElementById("tpEq");
-  for (let i = 0; i < 30; i++) {
-    const b = document.createElement("span");
-    b.style.setProperty("--h",  (0.35 + Math.random() * 0.65).toFixed(2));
-    b.style.setProperty("--dur",(0.55 + Math.random() * 0.7).toFixed(2) + "s");
-    b.style.setProperty("--dl", (-Math.random() * 1.2).toFixed(2) + "s");
-    eq.appendChild(b);
-  }
-  const pt = document.getElementById("tpParticles");
-  for (let i = 0; i < 14; i++) {
-    const p = document.createElement("span");
-    const sz = 2 + Math.random() * 3;
-    p.style.left = (4 + Math.random() * 92) + "%";
-    p.style.width = p.style.height = sz + "px";
-    p.style.animationDuration = (6 + Math.random() * 7) + "s";
-    p.style.animationDelay = (-Math.random() * 9) + "s";
-    pt.appendChild(p);
-  }
-})();
+function drawTp(now, dt) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.5), f = dt * 60;
+  const acc = (ALBUM_ACC[trackPageEl.dataset.album] || ALBUM_ACC.all).join(",");
 
-function refreshTpHeart() {
-  if (!trackPageOpen) return;
-  tpHeart.classList.toggle("liked", likedSet.has(currentTrackN));
+  // фон: волны снизу + ореол + кольца от пластинки
+  const W = Math.round(innerWidth * dpr), H = Math.round(innerHeight * dpr);
+  sizeCv(tpBgCv, W, H);
+  const g = tpBgG; g.clearRect(0, 0, W, H);
+  const rc = tpStage.getBoundingClientRect();
+  const cx = (rc.left + rc.width / 2) * dpr, cy = (rc.top + rc.height / 2) * dpr, R = rc.width / 2 * dpr;
+  if (rc.bottom > -50 && rc.top < innerHeight + 50) {
+    const halo = R * (1.5 + V.bass * 0.6);
+    const gr = g.createRadialGradient(cx, cy, R * 0.8, cx, cy, halo);
+    gr.addColorStop(0, `rgba(${acc},${(0.30 + V.bass * 0.25).toFixed(3)})`); gr.addColorStop(1, `rgba(${acc},0)`);
+    g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, halo, 0, 6.2832); g.fill();
+    if (V.hit) { tpRings.push({ r: R * 1.05, a: 0.8 }); if (tpRings.length > 8) tpRings.shift(); }
+    for (let i = tpRings.length - 1; i >= 0; i--) {
+      const r = tpRings[i]; r.r += (2.6 + V.bass * 4) * dpr * f; r.a -= 0.014 * f;
+      if (r.a <= 0) { tpRings.splice(i, 1); continue; }
+      g.beginPath(); g.arc(cx, cy, r.r, 0, 6.2832); g.lineWidth = 3 * dpr; g.strokeStyle = `rgba(242,228,196,${r.a.toFixed(3)})`; g.stroke();
+    }
+  }
+  const step = 16 * dpr;
+  for (let k = 0; k < 3; k++) {
+    const base = H * (0.92 - k * 0.04);
+    const amp = H * (0.012 + V.bass * 0.05 * (1 - k * 0.2) + V.mid * 0.02);
+    g.beginPath(); g.moveTo(0, H);
+    for (let x = 0; x <= W + step; x += step) {
+      const sx = Math.min(1, x / W);
+      const bump = V.spec[1 + ((Math.pow(sx, 1.7) * 160) | 0)] / 255 * H * 0.04 * (1 - k * 0.25);
+      g.lineTo(x, base - Math.sin(sx * Math.PI * (3 + k) + now * 0.0012 * (k + 1)) * amp - bump);
+    }
+    g.lineTo(W, H); g.closePath();
+    g.fillStyle = `rgba(${[acc, "224,86,31", "184,50,31"][k]},${(0.16 - k * 0.025 + V.bass * 0.10).toFixed(3)})`; g.fill();
+  }
+
+  // столбики спектра (плоские цвета, как на джазовых афишах) + «шапки»-пики
+  const sw = Math.max(1, Math.round(tpSpecCv.clientWidth * dpr)), sh = Math.max(1, Math.round(tpSpecCv.clientHeight * dpr));
+  sizeCv(tpSpecCv, sw, sh);
+  const s = tpSpecG; s.clearRect(0, 0, sw, sh);
+  const n = 40, gap = 3 * dpr, bw = (sw - gap * (n - 1)) / n;
+  for (let i = 0; i < n; i++) {
+    const idx = 1 + ((Math.pow(i / n, 1.9) * 210) | 0);
+    const v = Math.min(1, V.spec[idx] / 255 * (0.9 + i / n * 0.5));
+    const h = Math.max(3 * dpr, v * sh);
+    tpPeaks[i] = Math.max(h, tpPeaks[i] - 1.4 * dpr * f);
+    const x = i * (bw + gap);
+    s.fillStyle = `rgb(${i % 3 === 0 ? acc : TP_COLS[i % 3]})`;
+    s.fillRect(x, sh - h, bw, h);
+    s.fillStyle = "rgb(242,228,196)";
+    s.fillRect(x, sh - tpPeaks[i] - 3 * dpr, bw, 2 * dpr);
+  }
+
+  // пластинка и заголовок «подпрыгивают» на басах
+  tpVinylWrap.style.transform = `scale(${(1 + V.bass * 0.07).toFixed(3)})`;
+  tpTitle.style.setProperty("--sh", (3 + V.bass * 8).toFixed(1) + "px");
 }
+
+function refreshTpHeart() { if (trackPageOpen) tpHeart.classList.toggle("liked", likedSet.has(currentTrackN)); }
 
 function refreshTrackPage() {
   if (!trackPageOpen) return;
   const t = ALL_TRACKS.find(x => x.n === currentTrackN);
   if (!t) return;
   trackPageEl.dataset.album = t.album;
+  document.getElementById("lyricsSheet").dataset.album = t.album;
   tpTitle.textContent = t.title;
   tpArtist.textContent = t.artist;
   tpAlbum.textContent = ALBUM_META[t.album] ? ALBUM_META[t.album].label : "";
@@ -1992,13 +2306,17 @@ function refreshTrackPage() {
     `<span class="tp-chip" id="tpDurChip">⏱ ${dur ? fmt(dur) : "—:—"}</span>` +
     (t.tier === "pro" ? `<span class="tp-chip pro">👑 Pro+</span>` : "");
   tpHeart.classList.toggle("liked", likedSet.has(t.n));
-  tpProgress.value = 0; tpCur.textContent = "0:00"; tpDur.textContent = dur ? fmt(dur) : "0:00";
+  tpProgress.value = 0; tpProgress.style.setProperty("--p", "0%");
+  tpCur.textContent = "0:00"; tpDur.textContent = dur ? fmt(dur) : "0:00";
+  if (lyricsOpen) { lyrTitle.textContent = t.title; loadLyrics(t.n); }
   updateTpProgress();
 }
 
 function updateTpProgress() {
   if (!trackPageOpen || !audio.duration) return;
-  tpProgress.value = (audio.currentTime / audio.duration) * 100;
+  const pct = (audio.currentTime / audio.duration) * 100;
+  tpProgress.value = pct;
+  tpProgress.style.setProperty("--p", pct.toFixed(2) + "%");
   tpCur.textContent = fmt(audio.currentTime);
   tpDur.textContent = fmt(audio.duration);
   const chip = document.getElementById("tpDurChip");
@@ -2020,17 +2338,63 @@ function openTrackPage(n) {
   tpPlayIcon.innerHTML = isPlaying ? ICON_PAUSE : ICON_PLAY;
   trackPageEl.scrollTop = 0;
   refreshTrackPage();
+  vizKick();
   try { if (tg && tg.BackButton) tg.BackButton.show(); } catch(e) {}
 }
 function closeTrackPage() {
   if (!trackPageOpen) return;
+  closeLyrics();
   trackPageOpen = false;
   trackPageEl.classList.remove("show");
   setTimeout(() => { if (!trackPageOpen) trackPageEl.classList.add("hidden"); }, 360);
   try { if (tg && tg.BackButton) tg.BackButton.hide(); } catch(e) {}
 }
 
+// ── текст песни: файлы lyrics/<номер>.txt ──
+const lyricsSheet = document.getElementById("lyricsSheet");
+const lyrTitle    = document.getElementById("lyrTitle");
+const lyrBody     = document.getElementById("lyrBody");
+let lyricsOpen = false;
+const lyricsCache = new Map();
+
+async function loadLyrics(n) {
+  lyrBody.classList.add("dim"); lyrBody.textContent = "Загрузка текста…"; lyrBody.scrollTop = 0;
+  let text = lyricsCache.get(n);
+  if (text === undefined) {
+    try {
+      const r = await fetch("lyrics/" + n + ".txt", { cache: "no-cache" });
+      const ct = r.headers.get("content-type") || "";
+      if (!r.ok || /text\/html/i.test(ct)) text = null;
+      else {
+        text = (await r.text()).replace(/^﻿/, "").trim();
+        if (!text || /^<!doctype|^<html/i.test(text)) text = null;
+      }
+    } catch (e) { text = null; }
+    if (text) lyricsCache.set(n, text);
+  }
+  if (!lyricsOpen || n !== currentTrackN) return; // пока грузилось — закрыли или переключили трек
+  if (text) { lyrBody.classList.remove("dim"); lyrBody.textContent = text; }
+  else lyrBody.innerHTML = `<div class="lyr-empty"><b>Текст пока не добавлен</b>Положи файл <span style="color:var(--cream)">lyrics/${n}.txt</span><br>(обычный текст, UTF-8)</div>`;
+}
+function openLyrics() {
+  const t = ALL_TRACKS.find(x => x.n === currentTrackN);
+  if (!t) return;
+  lyricsOpen = true;
+  lyrTitle.textContent = t.title;
+  lyricsSheet.dataset.album = t.album;
+  lyricsSheet.classList.add("show");
+  loadLyrics(t.n);
+}
+function closeLyrics() {
+  if (!lyricsOpen) return;
+  lyricsOpen = false;
+  lyricsSheet.classList.remove("show");
+}
+function backAction() { if (lyricsOpen) closeLyrics(); else closeTrackPage(); }
+
 document.getElementById("tpBack").addEventListener("click", () => { playClickTick(); closeTrackPage(); });
+document.getElementById("lyrBack").addEventListener("click", () => { playClickTick(); closeLyrics(); });
+document.getElementById("tpLyrBtn").addEventListener("click", () => { playClickTick(); openLyrics(); });
 document.getElementById("tpPlay").addEventListener("click", () => { playClickTick(); audio.paused ? audio.play().catch(()=>{}) : audio.pause(); });
 document.getElementById("tpPrev").addEventListener("click", () => { playClickTick(); waveActive ? waveStep(false) : stepTrack(-1); });
 document.getElementById("tpNext").addEventListener("click", () => { playClickTick(); waveActive ? waveStep(true)  : stepTrack(1); });
@@ -2039,8 +2403,8 @@ tpHeart.addEventListener("click", () => {
   toggleLike(currentTrackN);
   likedSet.has(currentTrackN) ? playLikeTick() : playHoverTick();
 });
-document.addEventListener("keydown", e => { if (e.key === "Escape") closeTrackPage(); });
-try { if (tg && tg.BackButton && tg.BackButton.onClick) tg.BackButton.onClick(closeTrackPage); } catch(e) {}
+document.addEventListener("keydown", e => { if (e.key === "Escape") backAction(); });
+try { if (tg && tg.BackButton && tg.BackButton.onClick) tg.BackButton.onClick(backAction); } catch(e) {}
 
 // ═══════════════════════════════════════════════════
 // SPLASH — заставка автора, запускается сама, тап не нужен
