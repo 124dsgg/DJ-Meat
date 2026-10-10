@@ -803,6 +803,7 @@ ul.tracks{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
     <button data-album="putaria-best">PutariaBest · <span id="navCountPB">0</span></button>
     <button data-album="chanson">Шансон · <span id="navCountCH">0</span></button>
     <button data-album="newgen" class="newgen-tab" id="navNewgenBtn">NewGen · <span id="navCountNG">0</span></button>
+    <button data-album="lost-media" id="navLostBtn">Lost Media · <span id="navCountLM">0</span></button>
   </div>
 
   <div class="deck" id="deck">
@@ -960,6 +961,11 @@ const ALL_TRACKS = [
   {n:26, title:"Флирт",                        artist:"DJ Мясо",    album:"chanson",      tier:"pro",  file:"songs/26.mp3"},
   {n:27, title:"Сталкер",                      artist:"DJ Путария", album:"newgen",       tier:"pro",  file:"songs/27.mp3"},
   {n:28, title:"Планета обезьян",              artist:"DJ Путария", album:"putaria-best", tier:"lite", file:"songs/28.mp3"},
+  {n:29, title:"Картель",                      artist:"DJ Путария", album:"lost-media",   tier:"lite", file:"songs/29.mp3"},
+  {n:30, title:"Шапакляки",                    artist:"DJ Путария", album:"lost-media",   tier:"lite", file:"songs/30.mp3"},
+  {n:31, title:"Гунер",                        artist:"DJ Путария", album:"lost-media",   tier:"lite", file:"songs/31.mp3"},
+  {n:32, title:"Шалтай-Балтай",                artist:"DJ Мясо",    album:"lost-media",   tier:"lite", file:"songs/32.mp3"},
+  {n:33, title:"Сад плачущей химеры",          artist:"DJ Путария", album:"lost-media",   tier:"lite", file:"songs/33.mp3"},
 ];
 
 const ALBUM_META = {
@@ -968,9 +974,10 @@ const ALBUM_META = {
   "putaria-best": {h1:"PUTARIABEST",   label:"PutariaBest"},
   "chanson":      {h1:"ШАНСОН ЛУЧШЕЕ", label:"Шансон лучшее"},
   "newgen":       {h1:"NEWGEN",        label:"NewGen"},
+  "lost-media":   {h1:"LOST MEDIA",    label:"Lost Media"},
 };
 const ALBUM_SHORT = {
-  "old-money":"Old Money", "putaria-best":"PutariaBest", "chanson":"Шансон", "newgen":"NewGen"
+  "old-money":"Old Money", "putaria-best":"PutariaBest", "chanson":"Шансон", "newgen":"NewGen", "lost-media":"Lost Media"
 };
 
 const PRO_CODE  = "228148867";
@@ -987,7 +994,7 @@ let likedSet = new Set();
 
 // ── волна ──
 let waveActive = false;
-let waveSelectedAlbums = new Set(["old-money","putaria-best","chanson","newgen"]);
+let waveSelectedAlbums = new Set(["old-money","putaria-best","chanson","newgen","lost-media"]);
 let waveExcluded = new Set();
 let wavePool = [];
 let waveBag = [];
@@ -1131,6 +1138,7 @@ const appEl       = document.getElementById("app");
 const modeBar     = document.getElementById("modeBar");
 const albumNav    = document.getElementById("albumNav");
 const navNewgenBtn= document.getElementById("navNewgenBtn");
+const navLostBtn  = document.getElementById("navLostBtn");
 const albumH1     = document.getElementById("albumH1");
 const albumLabel  = document.getElementById("albumLabel");
 const globalHint  = document.getElementById("globalHint");
@@ -1209,7 +1217,7 @@ function getFiltered() {
 
 function updateNavCounts() {
   const base = baseList();
-  const map = {"all":"All","old-money":"OM","putaria-best":"PB","chanson":"CH","newgen":"NG"};
+  const map = {"all":"All","old-money":"OM","putaria-best":"PB","chanson":"CH","newgen":"NG","lost-media":"LM"};
   Object.keys(map).forEach(a => {
     const count = a==="all" ? base.length : base.filter(t=>t.album===a).length;
     const el = document.getElementById(`navCount${map[a]}`);
@@ -1222,12 +1230,18 @@ function updateNavCounts() {
     currentAlbum = "all";
     albumNav.querySelectorAll("button").forEach(b => b.classList.toggle("current", b.dataset.album==="all"));
   }
+  const lmCount = base.filter(t=>t.album==="lost-media").length;
+  navLostBtn.classList.toggle("hidden", lmCount === 0);
+  if (lmCount === 0 && currentAlbum === "lost-media") {
+    currentAlbum = "all";
+    albumNav.querySelectorAll("button").forEach(b => b.classList.toggle("current", b.dataset.album==="all"));
+  }
 }
 
 // ═══════════════════════════════════════════════════
 // ВОЛНА — случайное воспроизведение по настраиваемому пулу треков
 // ═══════════════════════════════════════════════════
-const WAVE_ALBUM_ORDER = ["old-money","putaria-best","chanson","newgen"];
+const WAVE_ALBUM_ORDER = ["old-money","putaria-best","chanson","newgen","lost-media"];
 
 function waveAvailableTracks() {
   // те же треки, что видны в текущем режиме (Lite не видит pro-треки)
