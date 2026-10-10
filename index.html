@@ -537,7 +537,7 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:0.04em;marg
 .playing .reel{animation-play-state:running}
 @keyframes spin{to{transform:rotate(360deg)}}
 .tape-window{flex:1;margin:0 16px;text-align:center;min-width:0}
-.now-title{font-weight:600;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+.now-title{font-weight:600;font-size:14.5px;white-space:normal;overflow-wrap:anywhere;line-height:1.3}
 .now-sub{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);margin-top:4px}
 
 /* ══════════ TRANSPORT ══════════ */
@@ -658,7 +658,7 @@ ul.tracks{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
 
 .tinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;z-index:1}
 .ttitle{font-size:17px;font-weight:600;line-height:1.25;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.ttitle-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.ttitle-text{white-space:normal;overflow-wrap:anywhere;word-break:break-word;min-width:0}
 .track.active .ttitle-text{color:var(--amber)}
 .track.pro-track.active .ttitle-text{color:var(--pro)}
 .tsub{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:6px}
@@ -746,6 +746,151 @@ ul.tracks{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
   .toolbar{flex-direction:column}
   .ttitle{font-size:15.5px}
 }
+
+/* ══════════ КНОПКА «СТРАНИЦА ПЕСНИ» В СТРОКЕ ══════════ */
+.info-btn{
+  width:28px;height:28px;flex-shrink:0;border:none;background:rgba(255,255,255,0.03);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:background .18s ease,transform .18s cubic-bezier(.2,.9,.25,1.4);z-index:1;
+}
+.info-btn:hover{background:var(--amber-dim);transform:scale(1.15)}
+.info-btn:active{transform:scale(0.8)}
+.info-btn svg{width:13px;height:13px;fill:none;stroke:var(--muted);stroke-width:2.2px;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s ease}
+.info-btn:hover svg{stroke:var(--amber)}
+@media(max-width:480px){.track{gap:9px;padding:14px 8px}.tnum{width:26px;font-size:17px}.tdur{width:34px;font-size:11.5px}}
+
+/* ══════════ СТРАНИЦА ПЕСНИ ══════════ */
+.tp{
+  position:fixed;inset:0;z-index:300;background:#0a0704;
+  overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
+  opacity:0;transform:translateY(26px);pointer-events:none;
+  transition:opacity .3s ease,transform .38s cubic-bezier(.2,.9,.25,1.1);
+  --acc:#e0a83a;--acc-rgb:224,168,58;
+}
+.tp.show{opacity:1;transform:none;pointer-events:auto}
+.tp[data-album="old-money"]{--acc:#e0a83a;--acc-rgb:224,168,58}
+.tp[data-album="putaria-best"]{--acc:#e2643a;--acc-rgb:226,100,58}
+.tp[data-album="chanson"]{--acc:#a56ae8;--acc-rgb:165,106,232}
+.tp[data-album="newgen"]{--acc:#f0b429;--acc-rgb:240,180,41}
+.tp[data-album="lost-media"]{--acc:#3cb4c8;--acc-rgb:60,180,200}
+.tp-bg{
+  position:fixed;inset:0;pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 24%,rgba(var(--acc-rgb),0.26),transparent 54%),
+    radial-gradient(circle at 12% 92%,rgba(201,79,40,0.14),transparent 50%),
+    radial-gradient(circle at 92% 78%,rgba(140,80,220,0.14),transparent 50%);
+  transition:background .6s ease;
+}
+.tp-glow{
+  position:fixed;left:50%;top:26%;width:420px;height:420px;margin:-210px 0 0 -210px;border-radius:50%;
+  pointer-events:none;background:radial-gradient(circle,rgba(var(--acc-rgb),0.34),transparent 65%);
+  filter:blur(26px);opacity:.55;animation:tp-glow 3.4s ease-in-out infinite;animation-play-state:paused;
+}
+.tp.playing .tp-glow{animation-play-state:running}
+@keyframes tp-glow{0%,100%{transform:scale(0.85);opacity:.4}50%{transform:scale(1.15);opacity:.85}}
+.tp-particles{position:fixed;inset:0;overflow:hidden;pointer-events:none}
+.tp-particles span{
+  position:absolute;bottom:-10px;border-radius:50%;background:var(--acc);opacity:0;
+  box-shadow:0 0 8px rgba(var(--acc-rgb),0.9);
+  animation:particle-rise linear infinite;animation-play-state:paused;
+}
+.tp.playing .tp-particles span{animation-play-state:running}
+
+.tp-inner{
+  position:relative;z-index:2;max-width:520px;min-height:100%;margin:0 auto;
+  padding:calc(16px + env(safe-area-inset-top,0px)) 22px calc(30px + env(safe-area-inset-bottom,0px));
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+}
+.tp-top{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tp-back{
+  font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:0.04em;color:var(--cream);
+  background:rgba(255,255,255,0.05);border:1px solid var(--line2);border-radius:12px;padding:10px 14px;cursor:pointer;
+  transition:transform .18s ease,border-color .18s ease;
+}
+.tp-back:hover{border-color:rgba(var(--acc-rgb),0.6);transform:translateX(-2px)}
+.tp-back:active{transform:scale(0.95)}
+.tp-album{
+  font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--acc);border:1px solid rgba(var(--acc-rgb),0.45);background:rgba(var(--acc-rgb),0.1);
+  border-radius:20px;padding:7px 12px;
+}
+#tpHeart{width:38px;height:38px}
+#tpHeart svg{width:16px;height:16px}
+
+.tp-stage{position:relative;width:min(66vw,280px);aspect-ratio:1/1;margin:26px auto 20px;flex-shrink:0}
+.tp-rings i{
+  position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(var(--acc-rgb),0.7);opacity:0;
+  animation:tp-ring 3.3s cubic-bezier(.15,.6,.4,1) infinite;animation-play-state:paused;
+}
+.tp-rings i:nth-child(2){animation-delay:1.1s}
+.tp-rings i:nth-child(3){animation-delay:2.2s}
+.tp.playing .tp-rings i{animation-play-state:running}
+@keyframes tp-ring{0%{transform:scale(0.95);opacity:0.7}100%{transform:scale(1.65);opacity:0}}
+.tp-vinyl{
+  position:absolute;inset:0;border-radius:50%;
+  background:repeating-conic-gradient(from 0deg,#251b0e 0deg 2.4deg,#150e07 2.4deg 4.8deg);
+  border:3px solid #3a2c17;
+  box-shadow:0 0 0 1px rgba(0,0,0,0.5),0 26px 60px -14px rgba(0,0,0,0.85),0 0 46px -10px rgba(var(--acc-rgb),0.5);
+  animation:vinylspin 4.5s linear infinite;animation-play-state:paused;
+}
+.tp.playing .tp-vinyl{animation-play-state:running}
+.tp-vinyl::before{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:
+    radial-gradient(circle,transparent 0 36%,rgba(0,0,0,0.4) 36.5% 37%,transparent 37.5%),
+    radial-gradient(circle,transparent 0 50%,rgba(0,0,0,0.3) 50.5% 51%,transparent 51.5%),
+    radial-gradient(circle,transparent 0 64%,rgba(0,0,0,0.25) 64.5% 65%,transparent 65.5%),
+    conic-gradient(from 0deg,transparent 0 16%,rgba(255,255,255,0.14) 22%,transparent 28% 66%,rgba(255,255,255,0.09) 72%,transparent 78%);
+}
+.tp-label{
+  position:absolute;left:50%;top:50%;width:36%;height:36%;margin:-18% 0 0 -18%;border-radius:50%;
+  background:radial-gradient(circle,#0a0805 0 6%,var(--acc) 6.5% 100%);
+  box-shadow:inset 0 0 14px rgba(0,0,0,0.45);
+}
+.tp-label::after{
+  content:'';position:absolute;left:50%;top:12%;width:9%;height:9%;margin-left:-4.5%;border-radius:50%;background:#120c06;
+}
+
+.tp-eq{display:flex;align-items:flex-end;justify-content:center;gap:4px;height:44px;width:100%;margin:2px 0 16px}
+.tp-eq span{
+  display:block;width:4px;height:100%;border-radius:2px;transform-origin:bottom;transform:scaleY(0.12);
+  background:linear-gradient(to top,var(--acc),rgba(255,255,255,0.55));
+  animation:tp-eq var(--dur,0.9s) ease-in-out infinite;animation-delay:var(--dl,0s);animation-play-state:paused;
+}
+.tp.playing .tp-eq span{animation-play-state:running}
+@keyframes tp-eq{0%,100%{transform:scaleY(0.14)}50%{transform:scaleY(var(--h,0.8))}}
+
+.tp-title{
+  font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,10.5vw,54px);line-height:1.03;letter-spacing:0.04em;
+  margin:0 0 8px;max-width:100%;overflow-wrap:anywhere;word-break:break-word;
+  background:linear-gradient(120deg,var(--cream) 0%,var(--acc) 45%,var(--cream) 80%);
+  background-size:240% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:name-shine 4s linear infinite;
+}
+.tp-title.swap,.tp-artist.swap{animation:tp-swap .45s cubic-bezier(.2,.9,.25,1.2),name-shine 4s linear infinite}
+.tp-artist.swap{animation:tp-swap .45s cubic-bezier(.2,.9,.25,1.2) .06s backwards}
+@keyframes tp-swap{from{opacity:0;transform:translateY(10px) scale(0.98)}to{opacity:1;transform:none}}
+.tp-artist{font-size:15px;font-weight:600;color:var(--acc);margin-bottom:14px}
+.tp-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-bottom:22px}
+.tp-chip{
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.05em;color:var(--cream);
+  background:rgba(255,255,255,0.05);border:1px solid var(--line2);border-radius:10px;padding:6px 11px;
+}
+.tp-chip.pro{color:#1a1208;background:linear-gradient(120deg,var(--pro),#ffd873);border-color:transparent;font-weight:700}
+
+.tp-seek{width:100%;display:flex;flex-direction:column;gap:6px}
+.tp-seek .row{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted)}
+.tp-seek input[type=range]{height:4px}
+.tp-seek input[type=range]::-webkit-slider-thumb{background:var(--acc);box-shadow:0 0 0 3px rgba(var(--acc-rgb),0.25)}
+.tp-transport{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:20px}
+.tp-transport button.ctrl{width:48px;height:48px}
+.tp-transport button.ctrl svg{width:17px;height:17px}
+button.tp-play{
+  width:68px!important;height:68px!important;background:var(--acc)!important;border-color:var(--acc)!important;
+  box-shadow:0 0 26px rgba(var(--acc-rgb),0.45);
+}
+button.tp-play svg{fill:#0e0b07!important;width:22px!important;height:22px!important}
+@media(prefers-reduced-motion:reduce){.tp-title{animation:none}}
 </style>
 </head>
 <body>
@@ -928,6 +1073,42 @@ ul.tracks{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
   <div class="wave-intro-hint" id="waveIntroHint">Дважды нажми, чтобы открыть плеер</div>
 </div>
 
+<!-- ══════════ СТРАНИЦА ПЕСНИ ══════════ -->
+<div class="tp hidden" id="trackPage" data-album="all">
+  <div class="tp-bg"></div>
+  <div class="tp-glow"></div>
+  <div class="tp-particles" id="tpParticles"></div>
+  <div class="tp-inner">
+    <div class="tp-top">
+      <button class="tp-back" id="tpBack">← Назад</button>
+      <span class="tp-album" id="tpAlbum">—</span>
+      <button class="heart-btn" id="tpHeart"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-10-9C.4 8.6 2 5 5.5 5 8 5 9.6 6.8 12 9.5 14.4 6.8 16 5 18.5 5 22 5 23.6 8.6 22 12c-2.5 4.4-10 9-10 9z"/></svg></button>
+    </div>
+
+    <div class="tp-stage">
+      <div class="tp-rings"><i></i><i></i><i></i></div>
+      <div class="tp-vinyl"><div class="tp-label"></div></div>
+    </div>
+
+    <div class="tp-eq" id="tpEq"></div>
+
+    <h2 class="tp-title" id="tpTitle">—</h2>
+    <div class="tp-artist" id="tpArtist">—</div>
+    <div class="tp-meta" id="tpMeta"></div>
+
+    <div class="tp-seek">
+      <input type="range" id="tpProgress" min="0" max="100" value="0" step="0.1">
+      <div class="row"><span id="tpCur">0:00</span><span id="tpDur">0:00</span></div>
+    </div>
+
+    <div class="tp-transport">
+      <button class="ctrl" id="tpPrev"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zM20 6v12L9 12z"/></svg></button>
+      <button class="ctrl tp-play" id="tpPlay"><svg id="tpPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+      <button class="ctrl" id="tpNext"><svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM4 6v12l11-6z"/></svg></button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ═══════════════════════════════════════════════════
 // ТРЕКИ. album: вкладка; tier: "lite" видно всем, "pro" видно только в Pro+
@@ -1020,6 +1201,7 @@ function toggleLike(n) {
   likedSet.has(n) ? likedSet.delete(n) : likedSet.add(n);
   saveLikes();
   updateLikedChip();
+  refreshTpHeart();
   if (showOnlyLiked) {
     renderList(); // набор треков реально меняется — тут пересборка уместна
   } else {
@@ -1178,6 +1360,8 @@ const waveExitBtn    = document.getElementById("waveExitBtn");
 const waveIntroEl    = document.getElementById("waveIntro");
 const waveIntroHint  = document.getElementById("waveIntroHint");
 
+const INFO_SVG   = '<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg>';
+let trackPageOpen = false;
 const ICON_PLAY  = '<path d="M8 5v14l11-7z"/>';
 const ICON_PAUSE = '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
 const EQ         = '<div class="eq"><span></span><span></span><span></span></div>';
@@ -1451,6 +1635,7 @@ function renderList() {
         <span class="tsub">${t.artist} ${albumChip}</span>
       </span>
       <span class="tdur" id="dur-${t.n}">${t.duration ? fmt(t.duration) : "—:—"}</span>
+      <button class="info-btn" data-n="${t.n}" aria-label="Страница песни">${INFO_SVG}</button>
       <button class="heart-btn${liked ? " liked" : ""}" data-n="${t.n}">${HEART_SVG}</button>
       <span class="tplay">${isActive && isPlaying ? EQ : PLAY_DOT}</span>
     `;
@@ -1468,6 +1653,11 @@ function renderList() {
       e.stopPropagation();
       toggleLike(t.n);
       likedSet.has(t.n) ? playLikeTick() : playHoverTick();
+    });
+    li.querySelector(".info-btn").addEventListener("click", e => {
+      e.stopPropagation();
+      playClickTick();
+      openTrackPage(t.n);
     });
     tracksEl.appendChild(li);
   });
@@ -1548,6 +1738,7 @@ function loadByN(n, autoplay) {
   counter.textContent = `${String(pos>=0?pos+1:1).padStart(2,"0")}/${list.length || 1}`;
   updateTrackStates(); // список уже на месте — просто помечаем нужную строку активной
   updateMediaSession(t);
+  refreshTrackPage();
   if (autoplay) audio.play().catch(()=>{});
 }
 
@@ -1565,6 +1756,8 @@ function setPlaying(state) {
   deck.classList.toggle("playing", state);
   playIcon.innerHTML = state ? ICON_PAUSE : ICON_PLAY;
   updateTrackStates();
+  trackPageEl.classList.toggle("playing", state);
+  tpPlayIcon.innerHTML = state ? ICON_PAUSE : ICON_PLAY;
   if ("mediaSession" in navigator) navigator.mediaSession.playbackState = state ? "playing" : "paused";
 }
 
@@ -1742,6 +1935,112 @@ pwInput.addEventListener("keydown", e => {
 // если Pro+ уже сохранён локально — подтягиваем статус, ничего не меняя в UI входа
 if (isProSaved()) { /* кнопка "Слушать" сама поймёт при клике */ }
 syncProCloud(() => { try { localStorage.setItem(PRO_KEY,"1"); } catch(e) {} });
+
+// ═══════════════════════════════════════════════════
+// СТРАНИЦА ПЕСНИ — большое название, крутящаяся пластинка, эффекты
+// ═══════════════════════════════════════════════════
+const trackPageEl = document.getElementById("trackPage");
+const tpTitle     = document.getElementById("tpTitle");
+const tpArtist    = document.getElementById("tpArtist");
+const tpAlbum     = document.getElementById("tpAlbum");
+const tpMeta      = document.getElementById("tpMeta");
+const tpHeart     = document.getElementById("tpHeart");
+const tpProgress  = document.getElementById("tpProgress");
+const tpCur       = document.getElementById("tpCur");
+const tpDur       = document.getElementById("tpDur");
+const tpPlayIcon  = document.getElementById("tpPlayIcon");
+
+// эквалайзер и частицы — генерируем один раз, анимируются только пока трек играет
+(function buildTpEffects() {
+  const eq = document.getElementById("tpEq");
+  for (let i = 0; i < 30; i++) {
+    const b = document.createElement("span");
+    b.style.setProperty("--h",  (0.35 + Math.random() * 0.65).toFixed(2));
+    b.style.setProperty("--dur",(0.55 + Math.random() * 0.7).toFixed(2) + "s");
+    b.style.setProperty("--dl", (-Math.random() * 1.2).toFixed(2) + "s");
+    eq.appendChild(b);
+  }
+  const pt = document.getElementById("tpParticles");
+  for (let i = 0; i < 14; i++) {
+    const p = document.createElement("span");
+    const sz = 2 + Math.random() * 3;
+    p.style.left = (4 + Math.random() * 92) + "%";
+    p.style.width = p.style.height = sz + "px";
+    p.style.animationDuration = (6 + Math.random() * 7) + "s";
+    p.style.animationDelay = (-Math.random() * 9) + "s";
+    pt.appendChild(p);
+  }
+})();
+
+function refreshTpHeart() {
+  if (!trackPageOpen) return;
+  tpHeart.classList.toggle("liked", likedSet.has(currentTrackN));
+}
+
+function refreshTrackPage() {
+  if (!trackPageOpen) return;
+  const t = ALL_TRACKS.find(x => x.n === currentTrackN);
+  if (!t) return;
+  trackPageEl.dataset.album = t.album;
+  tpTitle.textContent = t.title;
+  tpArtist.textContent = t.artist;
+  tpAlbum.textContent = ALBUM_META[t.album] ? ALBUM_META[t.album].label : "";
+  [tpTitle, tpArtist].forEach(el => { el.classList.remove("swap"); void el.offsetWidth; el.classList.add("swap"); });
+  const dur = audio.duration || t.duration;
+  tpMeta.innerHTML =
+    `<span class="tp-chip">№ ${String(t.n).padStart(2,"0")}</span>` +
+    `<span class="tp-chip" id="tpDurChip">⏱ ${dur ? fmt(dur) : "—:—"}</span>` +
+    (t.tier === "pro" ? `<span class="tp-chip pro">👑 Pro+</span>` : "");
+  tpHeart.classList.toggle("liked", likedSet.has(t.n));
+  tpProgress.value = 0; tpCur.textContent = "0:00"; tpDur.textContent = dur ? fmt(dur) : "0:00";
+  updateTpProgress();
+}
+
+function updateTpProgress() {
+  if (!trackPageOpen || !audio.duration) return;
+  tpProgress.value = (audio.currentTime / audio.duration) * 100;
+  tpCur.textContent = fmt(audio.currentTime);
+  tpDur.textContent = fmt(audio.duration);
+  const chip = document.getElementById("tpDurChip");
+  if (chip) chip.textContent = "⏱ " + fmt(audio.duration);
+}
+audio.addEventListener("timeupdate", updateTpProgress);
+audio.addEventListener("loadedmetadata", updateTpProgress);
+
+function openTrackPage(n) {
+  if (n !== currentTrackN) {
+    if (waveActive) exitWave();
+    loadByN(n, true);
+  }
+  trackPageOpen = true;
+  trackPageEl.classList.remove("hidden");
+  void trackPageEl.offsetWidth;
+  trackPageEl.classList.add("show");
+  trackPageEl.classList.toggle("playing", isPlaying);
+  tpPlayIcon.innerHTML = isPlaying ? ICON_PAUSE : ICON_PLAY;
+  trackPageEl.scrollTop = 0;
+  refreshTrackPage();
+  try { if (tg && tg.BackButton) tg.BackButton.show(); } catch(e) {}
+}
+function closeTrackPage() {
+  if (!trackPageOpen) return;
+  trackPageOpen = false;
+  trackPageEl.classList.remove("show");
+  setTimeout(() => { if (!trackPageOpen) trackPageEl.classList.add("hidden"); }, 360);
+  try { if (tg && tg.BackButton) tg.BackButton.hide(); } catch(e) {}
+}
+
+document.getElementById("tpBack").addEventListener("click", () => { playClickTick(); closeTrackPage(); });
+document.getElementById("tpPlay").addEventListener("click", () => { playClickTick(); audio.paused ? audio.play().catch(()=>{}) : audio.pause(); });
+document.getElementById("tpPrev").addEventListener("click", () => { playClickTick(); waveActive ? waveStep(false) : stepTrack(-1); });
+document.getElementById("tpNext").addEventListener("click", () => { playClickTick(); waveActive ? waveStep(true)  : stepTrack(1); });
+tpProgress.addEventListener("input", () => { if (audio.duration) audio.currentTime = (tpProgress.value / 100) * audio.duration; });
+tpHeart.addEventListener("click", () => {
+  toggleLike(currentTrackN);
+  likedSet.has(currentTrackN) ? playLikeTick() : playHoverTick();
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeTrackPage(); });
+try { if (tg && tg.BackButton && tg.BackButton.onClick) tg.BackButton.onClick(closeTrackPage); } catch(e) {}
 
 // ═══════════════════════════════════════════════════
 // SPLASH — заставка автора, запускается сама, тап не нужен
