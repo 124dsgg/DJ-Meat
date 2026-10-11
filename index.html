@@ -1487,19 +1487,23 @@ body.mode-pro .deck{border-color:rgba(255,211,91,.85)!important;box-shadow:0 30p
 
 
 /* PERFORMANCE + VINYL ALIGNMENT PATCH (mobile-first) */
-/* Pro+ remains metallic gold, but avoids multiple permanent animations per row. */
+/* Pro+ keeps lightweight, slow luxury motion without heavy filters or animated shadows. */
 .mode-bar{animation:none!important;filter:none!important;transform:none!important;background-position:50% 0!important}
 .mode-bar::after{display:none!important;animation:none!important}
 .mode-dot{animation:none!important;filter:none!important}
-.pro-ribbon{animation:none!important;transform:none!important;filter:none!important;background-position:50% 0!important;box-shadow:0 0 0 1px rgba(255,193,48,.24),0 0 8px rgba(255,185,35,.26),inset 0 1px rgba(255,255,255,.55)!important}
+.pro-ribbon{animation:pro-badge-sheen 4.8s ease-in-out infinite!important;transform:none!important;filter:none!important;background-image:linear-gradient(110deg,#9b6815 0%,#f6d66d 24%,#c28b20 42%,#ffeaa0 52%,#b47b17 72%,#f5d36a 100%)!important;background-size:220% 100%!important;box-shadow:0 0 0 1px rgba(255,193,48,.24),0 0 8px rgba(255,185,35,.26),inset 0 1px rgba(255,255,255,.55)!important}
 .track.pro-track::before{display:none!important;animation:none!important}
 .track.pro-track::after{display:none!important;animation:none!important}
 .track.pro-track.active::after{display:none!important;animation:none!important}
-.track.pro-track{box-shadow:inset 3px 0 0 #ffcf4f,0 0 0 1px rgba(255,200,65,.06)!important}
+.track.pro-track{background-image:linear-gradient(105deg,rgba(255,198,55,.055) 0%,rgba(125,72,12,.07) 38%,rgba(255,228,135,.13) 50%,rgba(125,72,12,.07) 62%,rgba(255,198,55,.055) 100%)!important;background-size:240% 100%!important;animation:pro-row-sheen 8s ease-in-out infinite!important;box-shadow:inset 3px 0 0 #ffcf4f,0 0 0 1px rgba(255,200,65,.06)!important}
 .track.pro-track.active{box-shadow:inset 3px 0 0 #fff0a0,0 0 12px rgba(255,188,40,.10)!important}
 .track.pro-track .ttitle-text{transition:color .15s ease;text-shadow:none!important}
 .track.pro-track:hover .ttitle-text,.track.pro-track.active .ttitle-text{text-shadow:0 0 7px rgba(255,190,40,.4)!important}
-/* One lightweight, short glint only when the user interacts with a Pro+ row. */
+@keyframes pro-badge-sheen{0%,100%{background-position:100% 0}50%{background-position:0 0}}
+@keyframes pro-row-sheen{0%,100%{background-position:100% 0}50%{background-position:0 0}}
+/* The whole Pro+ song row softly shimmers; override the global anti-lag one-shot rule. */
+.track.pro-track{animation:pro-row-sheen 6s ease-in-out infinite!important;animation-iteration-count:infinite!important;background-size:260% 100%!important}
+/* Short glint on touch remains independent from the idle shimmer. */
 @keyframes pro-interaction-glint{0%{background-position:150% 0}100%{background-position:-140% 0}}
 .track.pro-track:active{background-image:linear-gradient(105deg,transparent 35%,rgba(255,235,160,.16) 50%,transparent 65%),linear-gradient(100deg,rgba(255,198,55,.17),rgba(125,72,12,.1) 52%,rgba(255,221,112,.07))!important;background-size:220% 100%,100% 100%!important;animation:pro-interaction-glint .45s ease-out 1!important}
 /* Keep the record, its label and groove rings concentric at every viewport size. */
@@ -1525,7 +1529,7 @@ body.mode-pro .deck{border-color:rgba(255,211,91,.85)!important;box-shadow:0 30p
   .tp-sq{width:min(68vw,30vh,280px);height:min(68vw,30vh,280px)}
 }
 @media(prefers-reduced-motion:reduce){
-  .mode-bar,.mode-bar::after,.mode-dot,.pro-ribbon,.track.pro-track::after,.track.pro-track:active{animation:none!important}
+  .mode-bar,.mode-bar::after,.mode-dot,.pro-ribbon,.track.pro-track,.track.pro-track::after,.track.pro-track:active{animation:none!important}
 }
 
 </style>
