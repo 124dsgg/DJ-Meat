@@ -1584,6 +1584,19 @@ body.mode-pro .deck{border-color:rgba(255,211,91,.85)!important;box-shadow:0 30p
 }
 @media(prefers-reduced-motion:reduce){.bt-bottle:not(.crashed){animation:none!important}}
 
+/* VERSION 1.8 — smoother bottle-game camera and extra ambience for quieter game screens */
+.bt-chart{background-position:0 var(--camera-shift,0px),0 0,0 0!important;}
+.bt-chart::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 15%,rgba(255,228,137,.035) 48%,transparent 70%);background-size:220% 100%;animation:bt-chart-gloss 3.6s linear infinite;mix-blend-mode:screen}
+@keyframes bt-chart-gloss{from{background-position:120% 0}to{background-position:-120% 0}}
+.bt-chart #btLine{stroke-width:4.5;filter:drop-shadow(0 0 3px rgba(255,223,111,.95)) drop-shadow(0 0 8px rgba(255,171,34,.55))}
+.bt-chart #btArea{opacity:1}
+.bottle-felt{background-image:radial-gradient(ellipse at 50% 0%,rgba(255,207,84,.19),transparent 48%),linear-gradient(160deg,rgba(46,27,7,.92),rgba(9,6,3,.97))!important}
+/* Subtle decorative equalizer fills dead space in non-casino mini-games without covering controls. */
+.games.ingame .g-stage:not(:has(.felt)){position:relative;isolation:isolate}
+.games.ingame .g-stage:not(:has(.felt))::after{content:"♫  ━ ▂ ▅ ▃ ▇ ▄ ▆ ▂ ━  ♫";position:absolute;left:50%;bottom:4px;transform:translateX(-50%);width:min(88%,340px);padding:10px 8px;box-sizing:border-box;text-align:center;border:1px solid rgba(var(--g-rgb,224,168,58),.18);border-radius:12px;background:linear-gradient(90deg,transparent,rgba(var(--g-rgb,224,168,58),.055),transparent);color:rgba(var(--g-rgb,224,168,58),.52);font:10px/1.2 'JetBrains Mono',monospace;letter-spacing:.16em;pointer-events:none;opacity:.8}
+.games.ingame .g-stage:not(:has(.felt))::before{content:"";position:absolute;left:12%;right:12%;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--g-rgb,224,168,58),.22),transparent);pointer-events:none}
+@media(prefers-reduced-motion:reduce){.bt-chart::after{animation:none!important}}
+
 </style>
 </head>
 <body>
@@ -1600,7 +1613,7 @@ body.mode-pro .deck{border-color:rgba(255,211,91,.85)!important;box-shadow:0 30p
     </div>
     <div class="splash-skip hidden" id="splashSkip">Пропустить →</div>
   </div>
-  <div class="app-version">1.6</div>
+  <div class="app-version">1.8</div>
 </div>
 
 <!-- ══════════ ENTRY SCREEN ══════════ -->
@@ -3361,10 +3374,24 @@ GAMES.bottle = function () {
   const go=gCtl.querySelector('#btGo'), cash=gCtl.querySelector('#btCash'), multEl=gStage.querySelector('#btMult'), stateEl=gStage.querySelector('#btState'), msg=gStage.querySelector('#btMsg'), line=gStage.querySelector('#btLine'), area=gStage.querySelector('#btArea'), icon=gStage.querySelector('#btIcon'), crashEl=gStage.querySelector('#btCrash');
   let running=false, crashed=false, startAt=0, mult=1, bet=0, timer=null, points=[];
   function paint(){
-    const y=Math.max(12,170-(mult-1)*35); points.push(y); if(points.length>74)points.shift();
-    const step=302/Math.max(1,points.length-1), pts=points.map((py,i)=>(8+i*step)+','+py).join(' '), x=8+(points.length-1)*step;
-    line.setAttribute('points',pts); area.setAttribute('d','M 8 170 L '+pts.replace(/ /g,' L ')+' L '+x+' 170 Z');
-    icon.style.left=(Math.max(3,Math.min(88,(x/320)*100))+'%'); icon.style.bottom=(Math.max(4,Math.min(78,((170-y)/180)*100))+'%');
+    // Keep a moving camera on the multiplier: the graph keeps climbing instead of flattening at the top.
+    points.push(mult); if(points.length>56)points.shift();
+    const maxLog=Math.max(.12,Math.log(Math.max(1.01,mult)));
+    const step=304/Math.max(1,points.length-1);
+    const coords=points.map((value,i)=>{
+      const progress=Math.log(Math.max(1,value))/maxLog;
+      const y=166-Math.min(1,progress)*132;
+      return {x:8+i*step,y};
+    });
+    const pts=coords.map(q=>q.x.toFixed(1)+','+q.y.toFixed(1)).join(' ');
+    const last=coords[coords.length-1]||{x:8,y:166};
+    line.setAttribute('points',pts);
+    area.setAttribute('d','M 8 174 L '+pts.replace(/ /g,' L ')+' L '+last.x.toFixed(1)+' 174 Z');
+    // Bottle follows the camera and stays near the rising tip; the grid drifts downward to sell upward motion.
+    icon.style.left=(Math.max(2,Math.min(88,(last.x/320)*100))+'%');
+    icon.style.bottom=(Math.max(7,Math.min(74,((174-last.y)/180)*100))+'%');
+    const chart=gStage.querySelector('#btChart');
+    if(chart) chart.style.setProperty('--camera-shift',((performance.now()-startAt)*.035%30).toFixed(1)+'px');
   }
   function endCrash(){
     running=false;crashed=true;clearInterval(timer);timer=null;cash.disabled=true;go.disabled=false;go.textContent='Попробовать снова';st.lock=false;
@@ -3377,7 +3404,7 @@ GAMES.bottle = function () {
     if(running)return;
     if(go.dataset.broke){loan(go,'Поднять чекушку');return;}
     bet=Math.min(st.bet,gBest.chips);if(bet<1){brokeCheck(go,'Поднять чекушку');return;}
-    setChips(-bet);running=true;crashed=false;mult=1;points=[];startAt=performance.now();st.lock=true;go.disabled=true;cash.disabled=false;icon.classList.remove('crashed');crashEl.classList.remove('show');multEl.classList.remove('bt-win');line.setAttribute('points','8,170');area.setAttribute('d','M 8 170 L 8 170 Z');icon.style.left='3%';icon.style.bottom='4%';msg.textContent='Решай сам, когда забирать!';stateEl.textContent='Риск растёт каждую секунду';
+    setChips(-bet);running=true;crashed=false;mult=1;points=[];startAt=performance.now();st.lock=true;go.disabled=true;cash.disabled=false;icon.classList.remove('crashed');crashEl.classList.remove('show');multEl.classList.remove('bt-win');line.setAttribute('points','8,166');area.setAttribute('d','M 8 174 L 8 166 L 8 174 Z');icon.style.left='3%';icon.style.bottom='4%';const chart=gStage.querySelector('#btChart');if(chart)chart.style.setProperty('--camera-shift','0px');msg.textContent='Решай сам, когда забирать!';stateEl.textContent='Риск растёт каждую секунду';
     timer=setInterval(()=>{
       const elapsed=(performance.now()-startAt)/1000; mult=Math.exp(elapsed*.19);mult=Math.min(mult,1000);multEl.textContent=mult.toFixed(2)+'×';cash.textContent='Забрать ×'+mult.toFixed(2);paint();
       const hazard=Math.min(.16,(.012+elapsed*.006)*.1);
