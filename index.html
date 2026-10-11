@@ -1223,11 +1223,11 @@ input[type=range]:hover::-webkit-slider-thumb{transform:none;box-shadow:none}
 /* ══════════ V5 · два ряда без прокрутки, акцент альбома, подложка ══════════ */
 :root{--arg:242,177,52}
 body{--amber-dim:rgba(var(--arg),.14)}
-body:has(.albumnav [data-album="old-money"].current){--amber:#e3ac45;--arg:227,172,69}
-body:has(.albumnav [data-album="putaria-best"].current){--amber:#ff6b3d;--arg:255,107,61}
-body:has(.albumnav [data-album="chanson"].current){--amber:#a3cc5f;--arg:163,204,95}
-body:has(.albumnav [data-album="newgen"].current){--amber:#f6c443;--arg:246,196,67}
-body:has(.albumnav [data-album="lost-media"].current){--amber:#5cc1e0;--arg:92,193,224}
+body:has(.albumnav [data-album="old-money"].current){--amber:#d6ad55;--arg:214,173,85}
+body:has(.albumnav [data-album="putaria-best"].current){--amber:#c8754d;--arg:200,117,77}
+body:has(.albumnav [data-album="chanson"].current){--amber:#b98c62;--arg:185,140,98}
+body:has(.albumnav [data-album="newgen"].current){--amber:#e0bd68;--arg:224,189,104}
+body:has(.albumnav [data-album="lost-media"].current){--amber:#a85d45;--arg:168,93,69}
 body{background-image:radial-gradient(110% 46% at 50% -8%,rgba(var(--arg),.2),transparent 62%)}
 
 /* альбомы: 3×2 */
@@ -1235,11 +1235,11 @@ body{background-image:radial-gradient(110% 46% at 50% -8%,rgba(var(--arg),.2),tr
 .albumnav button{position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;min-width:0;min-height:56px;padding:9px 8px 9px 15px;border-radius:16px;text-align:left;white-space:normal;font-size:13px;font-weight:800;line-height:1.1;letter-spacing:-.01em;overflow-wrap:anywhere;--c:var(--amber);color:var(--cream)}
 .albumnav button::before{content:"";position:absolute;left:0;top:13px;bottom:13px;width:4px;border-radius:0 4px 4px 0;background:var(--c)}
 .albumnav button span{display:block;margin:0;font-size:11px;opacity:.65;font-weight:500}
-.albumnav button[data-album="old-money"]{--c:#e3ac45}
-.albumnav button[data-album="putaria-best"]{--c:#ff6b3d}
-.albumnav button[data-album="chanson"]{--c:#a3cc5f}
-.albumnav button[data-album="newgen"]{--c:#f6c443}
-.albumnav button[data-album="lost-media"]{--c:#5cc1e0}
+.albumnav button[data-album="old-money"]{--c:#d6ad55}
+.albumnav button[data-album="putaria-best"]{--c:#c8754d}
+.albumnav button[data-album="chanson"]{--c:#b98c62}
+.albumnav button[data-album="newgen"]{--c:#e0bd68}
+.albumnav button[data-album="lost-media"]{--c:#a85d45}
 .albumnav button.current,.albumnav button.newgen-tab.current{background:var(--c);border-color:var(--c);color:#17110a}
 .albumnav button.current::before{background:#17110a;opacity:.55}
 .albumnav button.current span{opacity:.7}
@@ -3039,85 +3039,122 @@ GAMES.bj = function () {
   gCleanup = () => {};
 };
 
-// ── УГАДАЙ ПЕСНЮ (отдельная кнопка на главной; длина фрагмента 1–3 с зависит от сложности) ──
+// ── УГАДАЙ ПЕСНЮ ──
 GAMES.guess = function () {
   gTitle.textContent = "🎧 УГАДАЙКА"; setChips(0);
-  const LEVELS = [["🌱", "Лёгкий", 3, 1], ["🔥", "Средний", 2, 1.5], ["💀", "Сложный", 1, 2]];
+  const LEVELS = [["🌱", "Лёгкий", 1.2, 1], ["🔥", "Средний", 0.8, 1.5], ["💀", "Сложный", 0.4, 2]];
   const discHTML = '<div class="gq-disc"><div class="gq-v"></div></div>';
   gCtl.innerHTML = "";
-  gStage.innerHTML = '<div class="felt"><div class="gq-hero">' + discHTML + '<h3>Угадай песню по кусочку</h3><p>Чем короче фрагмент, тем больше 💿' + (gBest.guess ? "<br>Рекорд: " + gBest.guess + " из 8" : "") + '</p></div><div class="gq-lvls" id="gqL"></div></div>';
+  gStage.innerHTML = '<div class="felt"><div class="gq-hero">' + discHTML + '<h3>Угадай песню по кусочку</h3><p>Нажми на уровень сложности</p>' + (gBest.guess ? '<p>Рекорд: ' + gBest.guess + ' из 8</p>' : '') + '</div><div class="gq-lvls" id="gqL"></div></div>';
   const lv = gStage.querySelector("#gqL");
+  let gameStarted = false;
   LEVELS.forEach((l, i) => {
     const b = document.createElement("button"); b.className = "gq-lvl"; b.dataset.i = i;
-    b.innerHTML = '<span class="gq-lvl-ico">' + l[0] + '</span><span class="gq-lvl-t"><b>' + l[1] + "</b><i>фрагмент " + l[2] + ' сек</i><span class="gq-lvl-bars">' + [8, 16, 11, 18, 9, 14, 7].slice(0, 2 + l[2] * 2).map(h => '<u style="height:' + h + 'px"></u>').join("") + '</span></span><span class="gq-lvl-m">×' + l[3] + "</span>";
+    b.innerHTML = '<span class="gq-lvl-ico">' + l[0] + '</span><span class="gq-lvl-t"><b>' + l[1] + "</b><i>фрагмент " + l[2] + ' сек</i><span class="gq-lvl-bars">' + [8,16,11,18,9,14,7].slice(0, 2 + l[2] * 2).map(h => '<u style="height:' + h + 'px"></u>').join("") + '</span></span><span class="gq-lvl-m">×' + l[3] + "</span>";
     lv.appendChild(b);
   });
-  lv.addEventListener("click", e => { const b = e.target.closest(".gq-lvl"); if (!b) return; const l = LEVELS[+b.dataset.i]; run(l[2], l[3]); });
+  lv.addEventListener("click", e => {
+    const b = e.target.closest(".gq-lvl"); if (!b || gameStarted) return;
+    const index = Number(b.dataset.i); if (!Number.isInteger(index) || !LEVELS[index]) return;
+    gameStarted = true; lv.querySelectorAll("button").forEach(x => x.disabled = true);
+    run(LEVELS[index][2], LEVELS[index][3]);
+  });
   gCleanup = () => {};
 
   function run(DUR, MULT) {
-    let pool = baseList().slice(); if (pool.length < 4) pool = ALL_TRACKS.slice();
-    const ROUNDS = 8, order = pool.sort(() => Math.random() - 0.5).slice(0, ROUNDS);
+    let pool = baseList().slice(); if (pool.length < 8) pool = ALL_TRACKS.slice();
+    const ROUNDS = Math.min(8, pool.length), order = pool.sort(() => Math.random() - 0.5).slice(0, ROUNDS);
     const wasPlaying = !audio.paused; if (wasPlaying) audio.pause();
     const snip = new Audio(); snip.preload = "auto"; snip.volume = audio.volume;
     let round = 0, score = 0, streak = 0, earned = 0, answered = false, stopT = 0, cur = null, dead = false, startAt = 0;
+    let playbackToken = 0, nextLocked = false, playingRequest = false;
     gStage.innerHTML = '<div class="felt"><div class="gq" id="gq"><div class="gq-top"><div class="gq-dots" id="gqD"></div><div class="gq-streak" id="gqS"></div></div>' +
-      '<div class="gq-disc"><svg class="gq-ring" viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="56"/><circle class="fg" id="gqFg" cx="60" cy="60" r="56"/></svg><div class="gq-v"></div></div>' +
-      '<div class="gq-eq"><i></i><i></i><i></i><i></i><i></i></div><div class="gq-q" id="czMsg">Слушай…</div><div class="gq-opts" id="gqO"></div></div></div>';
-    gCtl.innerHTML = '<div class="cz-row"><button class="g-btn sm ghost" id="gqRe">🔁 Ещё раз</button><button class="g-btn sm" id="gqNext" style="display:none">Дальше ▶</button></div>';
-    const root = gStage.querySelector("#gq"), opts = gStage.querySelector("#gqO"), msg = gStage.querySelector("#czMsg"), dEl = gStage.querySelector("#gqD"), sEl = gStage.querySelector("#gqS"), fg = gStage.querySelector("#gqFg");
+      '<div class="gq-disc" id="gqDisc" role="button" tabindex="0" aria-label="Прослушать фрагмент ещё раз"><svg class="gq-ring" viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="56"/><circle class="fg" id="gqFg" cx="60" cy="60" r="56"/></svg><div class="gq-v"></div></div>' +
+      '<div class="gq-eq"><i></i><i></i><i></i><i></i><i></i></div><div class="gq-q" id="czMsg">Загружаю фрагмент…</div><div class="gq-opts" id="gqO"></div></div></div>';
+    gCtl.innerHTML = '<div class="cz-row"><button class="g-btn sm" id="gqReplay" type="button">↻ Ещё раз</button><button class="g-btn sm" id="gqNext" type="button" style="display:none">Дальше ▶</button></div>';
+    const root = gStage.querySelector("#gq"), opts = gStage.querySelector("#gqO"), msg = gStage.querySelector("#czMsg"), dEl = gStage.querySelector("#gqD"), sEl = gStage.querySelector("#gqS"), fg = gStage.querySelector("#gqFg"), disc = gStage.querySelector("#gqDisc");
     for (let i = 0; i < ROUNDS; i++) dEl.appendChild(document.createElement("i"));
-    const dots = [...dEl.children];
-    const re = gCtl.querySelector("#gqRe"), nx = gCtl.querySelector("#gqNext");
+    const dots = [...dEl.children], nx = gCtl.querySelector("#gqNext"), replay = gCtl.querySelector("#gqReplay");
     const info = () => { sEl.textContent = "🔥 " + streak + " · +" + earned + " 💿"; dots.forEach((d, i) => { if (i === round && !d.className) d.className = "cur"; }); };
     const ringReset = () => { fg.style.transition = "none"; fg.style.strokeDashoffset = 0; };
-    const ringGo = () => { ringReset(); void fg.getBoundingClientRect(); fg.style.transition = "stroke-dashoffset " + DUR + "s linear"; fg.style.strokeDashoffset = 352; };
-    // таймер стартует, когда звук реально пошёл (загрузка не съедает секунды)
-    const arm = () => { clearTimeout(stopT); root.classList.add("on"); ringGo(); stopT = setTimeout(() => { snip.pause(); root.classList.remove("on"); }, DUR * 1000); };
-    function fire() {
-      snip.volume = audio.volume; snip.addEventListener("playing", arm, { once: true });
-      const pr = snip.play(); if (pr && pr.catch) pr.catch(() => { msg.textContent = "Нажми «Ещё раз», чтобы запустить звук"; });
-    }
-    function playSnip(fresh) {
-      clearTimeout(stopT); snip.pause(); ringReset(); root.classList.remove("on");
-      if (fresh) {
-        snip.src = cur.file;
-        snip.addEventListener("loadedmetadata", () => {
-          startAt = isFinite(snip.duration) && snip.duration > 12 ? snip.duration * (0.1 + Math.random() * 0.6) : 0;
-          snip.currentTime = startAt;
-        }, { once: true });
-      } else snip.currentTime = startAt;
-      fire();
+    const stopClip = () => { clearTimeout(stopT); playbackToken++; playingRequest = false; snip.pause(); root.classList.remove("on"); ringReset(); };
+    const arm = token => {
+      if (dead || answered || token !== playbackToken) return;
+      root.classList.add("on"); fg.style.transition = "none"; fg.style.strokeDashoffset = 0; void fg.getBoundingClientRect();
+      fg.style.transition = "stroke-dashoffset " + DUR + "s linear"; fg.style.strokeDashoffset = 352;
+      clearTimeout(stopT); stopT = setTimeout(() => {
+        if (token !== playbackToken) return;
+        snip.pause(); root.classList.remove("on"); playingRequest = false;
+      }, DUR * 1000);
+    };
+    async function playSnip(fresh) {
+      if (dead || answered || playingRequest) return;
+      playingRequest = true; clearTimeout(stopT); playbackToken++; const token = playbackToken;
+      snip.pause(); root.classList.remove("on"); ringReset();
+      try {
+        if (fresh) {
+          snip.src = cur.file; snip.load();
+          if (snip.readyState < 1) await new Promise((resolve, reject) => {
+            const ok = () => { cleanup(); resolve(); }, bad = () => { cleanup(); reject(new Error("audio load failed")); };
+            const cleanup = () => { snip.removeEventListener("loadedmetadata", ok); snip.removeEventListener("error", bad); };
+            snip.addEventListener("loadedmetadata", ok, { once: true }); snip.addEventListener("error", bad, { once: true });
+          });
+          if (dead || answered || token !== playbackToken) return;
+          startAt = Number.isFinite(snip.duration) && snip.duration > 12 ? snip.duration * (0.1 + Math.random() * 0.6) : 0;
+        }
+        if (token !== playbackToken || dead || answered) return;
+        if (Math.abs((snip.currentTime || 0) - startAt) > 0.03) {
+          await new Promise(resolve => {
+            let done = false; const finish = () => { if (done) return; done = true; snip.removeEventListener("seeked", finish); resolve(); };
+            snip.addEventListener("seeked", finish, { once: true });
+            try { snip.currentTime = startAt; } catch (_) { finish(); }
+            setTimeout(finish, 250);
+          });
+        }
+        if (token !== playbackToken || dead || answered) return;
+        snip.volume = audio.volume;
+        await snip.play();
+        if (token === playbackToken && !dead && !answered) arm(token);
+      } catch (_) {
+        if (token === playbackToken && !dead && !answered) msg.textContent = 'Не удалось включить звук. Нажми «Ещё раз» или на пластинку.';
+      } finally {
+        if (token === playbackToken) playingRequest = false;
+      }
     }
     function question() {
-      answered = false; nx.style.display = "none"; re.style.display = ""; cur = order[round];
+      answered = false; nextLocked = false; nx.disabled = false; nx.style.display = "none"; replay.disabled = false; cur = order[round];
       const wrong = ALL_TRACKS.filter(t => t.n !== cur.n && t.title !== cur.title).sort(() => Math.random() - 0.5).slice(0, 3);
       const list = wrong.concat([cur]).sort(() => Math.random() - 0.5);
-      opts.innerHTML = ""; msg.className = "gq-q"; msg.textContent = "Какая это песня? · " + DUR + " с";
+      opts.innerHTML = ""; msg.className = "gq-q"; msg.textContent = "Загружаю фрагмент…";
       list.forEach((t, i) => { const b = document.createElement("button"); b.className = "gq-opt"; b.dataset.n = t.n; b.innerHTML = '<span class="gq-k">' + "АБВГ"[i] + '</span><span class="gq-t"></span>'; const tt = b.querySelector(".gq-t"); tt.textContent = t.title; const sm = document.createElement("small"); sm.textContent = t.artist; tt.appendChild(sm); opts.appendChild(b); });
       info(); playSnip(true);
     }
+    const replayClip = () => { if (!answered && !dead && !playingRequest) playSnip(false); };
+    replay.addEventListener("click", replayClip);
+    disc.addEventListener("click", replayClip);
+    disc.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); replayClip(); } });
     opts.addEventListener("click", e => {
-      const b = e.target.closest(".gq-opt"); if (!b || answered) return; answered = true;
-      clearTimeout(stopT); snip.pause(); root.classList.remove("on"); ringReset();
+      const b = e.target.closest(".gq-opt"); if (!b || answered || dead) return;
+      answered = true; stopClip(); replay.disabled = true;
+      opts.querySelectorAll(".gq-opt").forEach(x => { x.disabled = true; if (+x.dataset.n === cur.n) x.classList.add("ok"); });
       const ok = +b.dataset.n === cur.n;
-      opts.querySelectorAll(".gq-opt").forEach(x => { if (+x.dataset.n === cur.n) x.classList.add("ok"); });
       if (ok) { streak++; score++; const w = Math.round((20 + Math.min(streak * 5, 25)) * MULT); earned += w; setChips(w); dots[round].className = "ok"; msg.className = "gq-q win"; msg.textContent = "Верно! +" + w + " 💿"; }
       else { b.classList.add("bad"); streak = 0; dots[round].className = "bad"; msg.className = "gq-q"; msg.textContent = "Это «" + cur.title + "»"; }
-      info(); re.style.display = "none"; nx.style.display = ""; nx.textContent = round + 1 >= ROUNDS ? "Итоги ▶" : "Дальше ▶";
+      info(); nx.style.display = ""; nx.textContent = round + 1 >= ROUNDS ? "Итоги ▶" : "Дальше ▶";
     });
-    re.addEventListener("click", () => { if (!answered) playSnip(false); });
     nx.addEventListener("click", () => {
+      if (!answered || nextLocked || dead) return;
+      nextLocked = true; nx.disabled = true;
       round++;
       if (round >= ROUNDS) {
-        const rec = score > 0 && bump("guess", score); bestLabel();
+        dead = true; stopClip(); const rec = score > 0 && bump("guess", score); bestLabel();
         const stars = score >= 7 ? "★★★" : score >= 5 ? "★★☆" : score >= 3 ? "★☆☆" : "☆☆☆";
         showOver("Раунды закончились", '<span style="font-size:26px;letter-spacing:6px;color:var(--amber)">' + stars + "</span><br>Угадано: " + score + " из " + ROUNDS + "<br>+" + earned + " 💿" + (rec ? "<br>🏆 новый рекорд!" : ""));
       } else question();
     });
-    snip.addEventListener("error", () => { if (!dead && !answered) msg.textContent = "Не удалось загрузить фрагмент"; });
+    snip.addEventListener("error", () => { if (!dead && !answered) msg.textContent = 'Не удалось загрузить фрагмент. Нажми «Ещё раз».'; });
+    gCleanup = () => { dead = true; stopClip(); snip.removeAttribute("src"); try { snip.load(); } catch (_) {} if (wasPlaying) audio.play().catch(() => {}); };
     question();
-    gCleanup = () => { dead = true; clearTimeout(stopT); snip.pause(); snip.removeAttribute("src"); try { snip.load(); } catch (e) {} if (wasPlaying) audio.play().catch(() => {}); };
   }
 };
 bestLabel(); refreshChipsUI();
