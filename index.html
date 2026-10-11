@@ -1532,6 +1532,16 @@ body.mode-pro .deck{border-color:rgba(255,211,91,.85)!important;box-shadow:0 30p
   .mode-bar,.mode-bar::after,.mode-dot,.pro-ribbon,.track.pro-track,.track.pro-track::after,.track.pro-track:active{animation:none!important}
 }
 
+
+/* v1.6: clearly visible but lightweight gold sweep across every Pro+ song row */
+.track.pro-track{position:relative;isolation:isolate;overflow:hidden;background-color:rgba(111,67,10,.14)!important;background-image:linear-gradient(105deg,rgba(255,190,35,.10) 0%,rgba(255,214,91,.20) 22%,rgba(119,69,7,.12) 42%,rgba(255,239,166,.32) 50%,rgba(169,103,12,.16) 62%,rgba(255,194,35,.12) 100%)!important;background-size:320% 100%!important;animation:pro-row-sheen-v16 3.2s linear infinite!important;}
+.track.pro-track::after{content:""!important;display:block!important;position:absolute!important;z-index:0!important;pointer-events:none!important;inset:0!important;border:0!important;border-radius:inherit!important;background:linear-gradient(105deg,transparent 0%,transparent 35%,rgba(255,246,196,.04) 42%,rgba(255,239,158,.55) 49%,rgba(255,255,226,.72) 51%,rgba(255,202,66,.25) 57%,transparent 66%,transparent 100%)!important;background-size:320% 100%!important;animation:pro-row-glint-v16 3.2s linear infinite!important;}
+.track.pro-track>*{position:relative;z-index:1}
+@keyframes pro-row-sheen-v16{0%{background-position:100% 0}100%{background-position:-220% 0}}
+@keyframes pro-row-glint-v16{0%{background-position:120% 0;opacity:.15}15%{opacity:.95}65%{opacity:.9}100%{background-position:-220% 0;opacity:.15}}
+.app-version{margin:12px auto 0;font:500 9px/1.2 'JetBrains Mono',monospace;letter-spacing:.16em;color:rgba(218,180,100,.48);text-transform:uppercase}
+@media(prefers-reduced-motion:reduce){.track.pro-track,.track.pro-track::after{animation:none!important}}
+
 </style>
 </head>
 <body>
@@ -1556,6 +1566,7 @@ body.mode-pro .deck{border-color:rgba(255,211,91,.85)!important;box-shadow:0 30p
     <div class="entry-mini-vinyl"></div>
     <div class="entry-title">АЛЬБОМ</div>
     <div class="entry-sub">DJ Мясо × DJ Путария</div>
+    <div class="app-version">VERSION 1.6</div>
 
     <button class="entry-main-btn" id="enterMainBtn">Слушать</button>
     <button class="entry-secret-link" id="secretLinkBtn">Ты свой? 👀</button>
