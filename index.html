@@ -1413,8 +1413,8 @@ body:has(.albumnav [data-album="lost-media"].current){--amber:#f2bd45;--arg:242,
 }
 .track.pro-track::after{
   content:"";position:absolute;pointer-events:none;inset:0;border-radius:inherit;
-  background:linear-gradient(105deg,transparent 20%,rgba(255,226,127,.1) 45%,transparent 66%);
-  background-size:220% 100%;animation:pro-track-glimmer 4s linear infinite;
+  background:linear-gradient(105deg,transparent 8%,rgba(255,226,127,.06) 28%,rgba(255,244,184,.42) 47%,rgba(255,191,45,.16) 52%,transparent 70%);
+  background-size:240% 100%;animation:pro-track-glimmer 2.7s linear infinite;
 }
 .track.pro-track .tnum,.track.pro-track.active .ttitle-text{color:#ffd76a!important;text-shadow:0 0 12px rgba(255,190,40,.36)}
 .track.pro-track.active{background:linear-gradient(100deg,rgba(255,205,73,.28),rgba(132,77,13,.16),rgba(255,228,135,.11))!important;box-shadow:inset 3px 0 0 #fff0a0,0 0 22px rgba(255,188,40,.15)!important}
@@ -1425,7 +1425,10 @@ body.mode-pro .deck{border-color:rgba(255,211,91,.85)!important;box-shadow:0 30p
 @keyframes pro-dot-glow{from{filter:brightness(.9);transform:scale(.92)}to{filter:brightness(1.5);transform:scale(1.12)}}
 @keyframes pro-ribbon-metal{0%{background-position:100% 0}100%{background-position:-160% 0}}
 @keyframes pro-ribbon-float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-1px) scale(1.045)}}
-@keyframes pro-track-glimmer{0%{background-position:150% 0}100%{background-position:-120% 0}}
+@keyframes pro-track-glimmer{0%{background-position:150% 0}100%{background-position:-140% 0}}
+.track.pro-track .ttitle-text{transition:text-shadow .25s ease,color .25s ease}
+.track.pro-track:hover .ttitle-text,.track.pro-track.active .ttitle-text{color:#fff0a6!important;text-shadow:0 0 5px #ffdf79,0 0 14px rgba(255,190,40,.85),0 0 25px rgba(255,165,25,.42)!important}
+.track.pro-track.active::after{background:linear-gradient(105deg,transparent 4%,rgba(255,230,150,.16) 25%,rgba(255,250,210,.58) 47%,rgba(255,190,45,.24) 53%,transparent 72%);background-size:240% 100%;animation:pro-track-glimmer 1.65s linear infinite}
 @media(prefers-reduced-motion:reduce){.mode-bar,.mode-bar::after,.pro-ribbon,.track.pro-track::after,.mode-dot{animation:none!important}}
 
 
@@ -1466,6 +1469,21 @@ body.mode-pro .deck{border-color:rgba(255,211,91,.85)!important;box-shadow:0 30p
 .bt-crash{position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,9vw,54px);letter-spacing:.12em;color:#ffcf6a;text-shadow:0 0 14px #e7781c,0 0 32px #f43;z-index:3;background:rgba(40,8,0,.18)}
 .bt-crash.show{display:flex;animation:btFlash .22s ease-in-out 3 alternate}
 @keyframes btFlash{to{background:rgba(255,90,20,.24)}}
+
+/* Безтекстовый золотой эффект награды: верхняя половина экрана, не блокирует касания. */
+.gold-reward-burst{position:fixed;z-index:1201;left:0;right:0;top:0;height:50vh;min-height:240px;overflow:hidden;pointer-events:none;isolation:isolate;animation:grb-in .22s ease-out both}
+.gold-reward-halo{position:absolute;width:110vw;height:110vw;max-height:70vh;left:50%;top:100%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(255,239,163,.34),rgba(255,181,35,.16) 26%,rgba(255,156,10,.055) 48%,transparent 69%);animation:grb-halo 1.5s ease-out both}
+.gold-reward-ring{position:absolute;width:min(70vw,440px);aspect-ratio:1;left:50%;top:100%;border:2px solid rgba(255,222,112,.8);border-radius:50%;transform:translate(-50%,-50%) scale(.15);box-shadow:0 0 22px rgba(255,190,35,.55),inset 0 0 18px rgba(255,210,80,.2);animation:grb-ring 1.25s cubic-bezier(.1,.7,.2,1) both}
+.gold-reward-shards{position:absolute;inset:0;overflow:hidden}
+.gold-reward-shards i{position:absolute;left:var(--left);top:var(--top);font-style:normal;color:#fff0a0;font-size:clamp(12px,2.7vw,25px);opacity:0;text-shadow:0 0 7px #fff2a8,0 0 20px #ffb21e;animation:grb-shard 1.75s cubic-bezier(.15,.65,.25,1) calc(var(--i)*.018s) both}
+@keyframes grb-in{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
+@keyframes grb-halo{0%{opacity:0;transform:translate(-50%,-50%) scale(.15)}25%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1.25)}}
+@keyframes grb-ring{0%{opacity:0;transform:translate(-50%,-50%) scale(.15)}20%{opacity:.9}100%{opacity:0;transform:translate(-50%,-50%) scale(1.5)}}
+@keyframes grb-shard{0%{opacity:0;transform:translate3d(0,45px,0) scale(.25) rotate(0)}18%{opacity:1}100%{opacity:0;transform:translate3d(0,-45vh,0) scale(1.1) rotate(260deg)}}
+@media(prefers-reduced-motion:reduce){.gold-reward-burst,.gold-reward-halo,.gold-reward-ring,.gold-reward-shards i{animation:none!important;opacity:0!important}}
+.gq-continue{min-width:140px;box-shadow:0 0 0 1px rgba(255,221,112,.45),0 0 18px rgba(255,184,35,.22);animation:gq-next-pulse 1.25s ease-in-out infinite alternate}
+@keyframes gq-next-pulse{to{box-shadow:0 0 0 1px rgba(255,239,166,.8),0 0 24px rgba(255,184,35,.48);filter:brightness(1.12)}}
+
 </style>
 </head>
 <body>
@@ -2807,7 +2825,14 @@ const gTh = () => getTheme(currentTrackN || 1);
 const gTrack = () => ALL_TRACKS.find(t => t.n === (currentTrackN || 1)) || ALL_TRACKS[0];
 const titleChars = () => [...gTrack().title.toUpperCase()].filter(c => /[\p{L}\p{N}]/u.test(c));
 function saveG() { try { localStorage.setItem(GKEY, JSON.stringify(gBest)); } catch(e) {} }
-function setChips(d) { gBest.chips = Math.max(0, gBest.chips + d); saveG(); gScore.textContent = "💿 " + gBest.chips; }
+function showGoldRewardFX() {
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const old = document.getElementById("goldRewardBurst"); if (old) old.remove();
+  const fx = document.createElement("div"); fx.id = "goldRewardBurst"; fx.className = "gold-reward-burst"; fx.setAttribute("aria-hidden", "true");
+  fx.innerHTML = '<div class="gold-reward-halo"></div><div class="gold-reward-ring"></div><div class="gold-reward-shards">' + Array.from({length:34}, (_,i)=>'<i style="--i:'+i+';--left:'+((i*29+3)%97)+'%;--top:'+(8+(i*17)%78)+'%">'+(i%3===0?'✦':i%3===1?'✧':'◆')+'</i>').join('') + '</div>';
+  document.body.appendChild(fx); setTimeout(()=>{ if (fx.isConnected) fx.remove(); }, 2400);
+}
+function setChips(d) { gBest.chips = Math.max(0, gBest.chips + d); saveG(); gScore.textContent = "💿 " + gBest.chips; if (d > 0) showGoldRewardFX(); }
 if (typeof gBest.chips !== "number") gBest.chips = 1000;
 function applyGTheme() {
   const th = gTh(), st = gamesEl.style;
@@ -3039,13 +3064,7 @@ GAMES.timekiller = function () {
     live=false; clearInterval(timer); clearInterval(mover); timer=mover=null; target.disabled=true; start.disabled=true; start.textContent='Раунд завершён';
     const reward=score*2;
     msg.textContent='Время! Попаданий: '+score+'. Начисляем награду…';
-    // Большая, но некликабельная золотая анимация занимает верхнюю половину экрана.
-    const fx=document.createElement('div'); fx.className='tk-reward-fx'; fx.setAttribute('aria-hidden','true');
-    fx.innerHTML='<div class="tk-reward-glow"></div><div class="tk-reward-title">ПОБЕДА!</div><div class="tk-reward-count">+0 💿</div><div class="tk-reward-particles">'+Array.from({length:22},(_,i)=>'<i style="--i:'+i+'">✦</i>').join('')+'</div>';
-    document.body.appendChild(fx);
-    const count=fx.querySelector('.tk-reward-count'); const duration=2200, started=performance.now(); let raf=0;
-    function tick(now){ const t=Math.min(1,(now-started)/duration); const eased=1-Math.pow(1-t,3); count.textContent='+'+Math.floor(reward*eased)+' 💿'; if(t<1){raf=requestAnimationFrame(tick);} else {count.textContent='+'+reward+' 💿'; setTimeout(()=>fx.remove(),850);} }
-    raf=requestAnimationFrame(tick);
+    // Награда сопровождается общей безтекстовой золотой анимацией из earnChips().
     const credited=earnChips(reward);
     const overBtn=document.getElementById('gOverBtn'); overBtn.textContent='Далее'; overBtn.dataset.action='menu';
     showOver('Хаос завершён!', 'Попаданий: '+score+'<br>Награда: +'+credited+' 💿');
@@ -3072,7 +3091,7 @@ function refreshChipsUI() {
   if (gamesOpen && gChips) gScore.textContent = "💿 " + gBest.chips;
   bestLabel();
 }
-function earnChips(n) { n = Math.max(0, Math.floor(n)); gBest.chips += n; saveG(); refreshChipsUI(); return n; }
+function earnChips(n) { n = Math.max(0, Math.floor(n)); gBest.chips += n; saveG(); refreshChipsUI(); if (n > 0) showGoldRewardFX(); return n; }
 // 1 💿 за каждые 5 секунд реального прослушивания (перемотка не считается)
 let _lt = 0, _acc = 0;
 audio.addEventListener("timeupdate", () => {
@@ -3301,7 +3320,7 @@ GAMES.guess = function () {
     gStage.innerHTML = '<div class="felt"><div class="gq" id="gq"><div class="gq-top"><div class="gq-dots" id="gqD"></div><div class="gq-streak" id="gqS"></div></div>' +
       '<div class="gq-disc" id="gqDisc" role="button" tabindex="0" aria-label="Прослушать фрагмент ещё раз"><svg class="gq-ring" viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="56"/><circle class="fg" id="gqFg" cx="60" cy="60" r="56"/></svg><div class="gq-v"></div></div>' +
       '<div class="gq-eq"><i></i><i></i><i></i><i></i><i></i></div><div class="gq-q" id="czMsg">Загружаю фрагмент…</div><div class="gq-opts" id="gqO"></div></div></div>';
-    gCtl.innerHTML = '<div class="cz-row"><button class="g-btn sm" id="gqReplay" type="button">↻ Ещё раз</button><button class="g-btn sm" id="gqNext" type="button" style="display:none">Дальше ▶</button></div>';
+    gCtl.innerHTML = '<div class="cz-row"><button class="g-btn sm" id="gqReplay" type="button">↻ Ещё раз</button><button class="g-btn sm" id="gqNext" type="button" style="display:none" aria-hidden="true" tabindex="-1">Далее ▶</button></div>';
     const root = gStage.querySelector("#gq"), opts = gStage.querySelector("#gqO"), msg = gStage.querySelector("#czMsg"), dEl = gStage.querySelector("#gqD"), sEl = gStage.querySelector("#gqS"), fg = gStage.querySelector("#gqFg"), disc = gStage.querySelector("#gqDisc");
     for (let i = 0; i < ROUNDS; i++) dEl.appendChild(document.createElement("i"));
     const dots = [...dEl.children], nx = gCtl.querySelector("#gqNext"), replay = gCtl.querySelector("#gqReplay");
@@ -3352,36 +3371,40 @@ GAMES.guess = function () {
       }
     }
     function question() {
-      answered = false; nextLocked = false; nx.disabled = false; nx.style.display = "none"; replay.disabled = false; cur = order[round];
+      answered = false; nextLocked = false; nx.disabled = false; nx.style.display = "none"; replay.disabled = false; replay.textContent = "↻ Ещё раз"; replay.classList.remove("gq-continue"); cur = order[round];
       const wrong = ALL_TRACKS.filter(t => t.n !== cur.n && t.title !== cur.title).sort(() => Math.random() - 0.5).slice(0, 3);
       const list = wrong.concat([cur]).sort(() => Math.random() - 0.5);
       opts.innerHTML = ""; msg.className = "gq-q"; msg.textContent = "Загружаю фрагмент…";
       list.forEach((t, i) => { const b = document.createElement("button"); b.className = "gq-opt"; b.dataset.n = t.n; b.innerHTML = '<span class="gq-k">' + "АБВГ"[i] + '</span><span class="gq-t"></span>'; const tt = b.querySelector(".gq-t"); tt.textContent = t.title; const sm = document.createElement("small"); sm.textContent = t.artist; tt.appendChild(sm); opts.appendChild(b); });
       info(); playSnip(true);
     }
-    const replayClip = () => { if (!answered && !dead && !playingRequest) playSnip(false); };
-    replay.addEventListener("click", replayClip);
-    disc.addEventListener("click", replayClip);
-    disc.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); replayClip(); } });
-    opts.addEventListener("click", e => {
-      const b = e.target.closest(".gq-opt"); if (!b || answered || dead) return;
-      answered = true; stopClip(); replay.disabled = true;
-      opts.querySelectorAll(".gq-opt").forEach(x => { x.disabled = true; if (+x.dataset.n === cur.n) x.classList.add("ok"); });
-      const ok = +b.dataset.n === cur.n;
-      if (ok) { streak++; score++; const w = Math.round((20 + Math.min(streak * 5, 25)) * MULT); earned += w; setChips(w); dots[round].className = "ok"; msg.className = "gq-q win"; msg.textContent = "Верно! +" + w + " 💿"; }
-      else { b.classList.add("bad"); streak = 0; dots[round].className = "bad"; msg.className = "gq-q"; msg.textContent = "Это «" + cur.title + "»"; }
-      info(); nx.style.display = ""; nx.textContent = round + 1 >= ROUNDS ? "Итоги ▶" : "Дальше ▶";
-    });
-    nx.addEventListener("click", () => {
+    function advanceRound() {
       if (!answered || nextLocked || dead) return;
-      nextLocked = true; nx.disabled = true;
+      nextLocked = true; replay.disabled = true; nx.disabled = true;
       round++;
       if (round >= ROUNDS) {
         dead = true; stopClip(); const rec = score > 0 && bump("guess", score); bestLabel();
         const stars = score >= 7 ? "★★★" : score >= 5 ? "★★☆" : score >= 3 ? "★☆☆" : "☆☆☆";
         showOver("Раунды закончились", '<span style="font-size:26px;letter-spacing:6px;color:var(--amber)">' + stars + "</span><br>Угадано: " + score + " из " + ROUNDS + "<br>+" + earned + " 💿" + (rec ? "<br>🏆 новый рекорд!" : ""));
       } else question();
+    }
+    const replayClip = () => {
+      if (dead || nextLocked || answered) return;
+      if (!playingRequest) playSnip(false);
+    };
+    replay.addEventListener("click", () => { if (answered) advanceRound(); else replayClip(); });
+    disc.addEventListener("click", replayClip);
+    disc.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); replayClip(); } });
+    opts.addEventListener("click", e => {
+      const b = e.target.closest(".gq-opt"); if (!b || answered || dead) return;
+      answered = true; stopClip(); replay.disabled = false;
+      opts.querySelectorAll(".gq-opt").forEach(x => { x.disabled = true; if (+x.dataset.n === cur.n) x.classList.add("ok"); });
+      const ok = +b.dataset.n === cur.n;
+      if (ok) { streak++; score++; const w = Math.round((20 + Math.min(streak * 5, 25)) * MULT); earned += w; setChips(w); dots[round].className = "ok"; msg.className = "gq-q win"; msg.textContent = "Верно! +" + w + " 💿"; }
+      else { b.classList.add("bad"); streak = 0; dots[round].className = "bad"; msg.className = "gq-q"; msg.textContent = "Это «" + cur.title + "»"; }
+      info(); replay.textContent = "Далее ▶"; replay.classList.add("gq-continue"); nx.style.display = "none";
     });
+    nx.addEventListener("click", advanceRound);
     snip.addEventListener("error", () => { if (!dead && !answered) msg.textContent = 'Не удалось загрузить фрагмент. Нажми «Ещё раз».'; });
     gCleanup = () => { dead = true; stopClip(); snip.removeAttribute("src"); try { snip.load(); } catch (_) {} if (wasPlaying) audio.play().catch(() => {}); };
     question();
