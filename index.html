@@ -1541,6 +1541,49 @@ body.mode-pro .deck{border-color:rgba(255,211,91,.85)!important;box-shadow:0 30p
 .app-version{position:absolute;right:10px;bottom:8px;margin:0;font:500 9px/1 'JetBrains Mono',monospace;letter-spacing:.06em;color:rgba(218,180,100,.48);text-transform:none;pointer-events:none}
 @media(prefers-reduced-motion:reduce){.track.pro-track::after{animation:none!important;display:none!important}}
 
+
+
+/* V1.6.1 — casino layout fixes: keep the game table and controls in separate areas */
+.games.ingame .g-play{min-height:0;overflow:hidden}
+.games.ingame .g-stage:has(.felt){display:block;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding:6px 2px 12px;box-sizing:border-box;overscroll-behavior:contain}
+.games.ingame .g-stage:has(.felt)>.felt{width:100%;max-width:100%;min-width:0;box-sizing:border-box;margin:0 auto;flex-shrink:0;gap:clamp(7px,1.4vh,12px);padding:clamp(10px,2vh,14px) clamp(8px,2.5vw,12px)}
+.games.ingame .g-ctl{position:relative;z-index:2;flex:0 0 auto;width:100%;box-sizing:border-box;padding:8px 0 max(6px, env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(12,8,4,0),rgba(12,8,4,.92) 18%)}
+.games.ingame .cz-ctl{gap:7px;padding:0 2px;box-sizing:border-box}
+.games.ingame .cz-ctl>div{max-width:100%;}
+.games.ingame #czBets,.games.ingame #btBets{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;width:100%;}
+.games.ingame .bet{padding:8px 11px;font-size:12px;min-height:36px;}
+.games.ingame .cz-ctl .g-btn{width:100%;max-width:360px;min-height:44px;box-sizing:border-box}
+/* Slot reels: no red center line; keep three reels inside the cabinet on narrow screens */
+.felt .sreels{width:max-content;max-width:100%;box-sizing:border-box;display:flex;justify-content:center;align-items:center;gap:clamp(5px,1.8vw,8px);padding:clamp(6px,2vw,10px);overflow:hidden}
+.felt .sreel{width:clamp(54px,19vw,92px);height:clamp(72px,12vh,110px);flex:0 1 92px;min-width:0;font-size:clamp(31px,8vw,54px);}
+.felt .sreels::after{display:none!important;content:none!important}
+.slot-bulbs{justify-content:center;flex-wrap:wrap;max-width:100%}
+.slot-top{text-align:center;max-width:100%;font-size:clamp(16px,4.5vw,18px);letter-spacing:clamp(.08em,.8vw,.2em);line-height:1.15}
+.pay{max-width:100%;overflow-wrap:anywhere;padding:0 2px}
+/* Roulette wheel: centered and responsive, with no overflowing wheel/control overlap */
+.rl{flex-shrink:0;margin:4px auto 0;max-width:100%;}
+.rl svg{filter:drop-shadow(0 5px 9px rgba(0,0,0,.48))}
+.rl-res,.rl-hist{max-width:100%;flex-wrap:wrap;justify-content:center}
+/* Чекушка: cleaner, sharper rising graph and more legible multiplier feedback */
+.bottle-felt{gap:clamp(8px,1.6vh,12px)!important}
+.bottle-readout{width:100%;padding:2px 0 4px;}
+.bottle-readout strong{font-size:clamp(44px,11vw,66px);text-shadow:0 0 5px rgba(255,220,119,.55),0 0 15px rgba(255,174,40,.3)}
+.bt-chart{height:clamp(180px,30vh,245px);border:1px solid rgba(255,214,107,.55);background-color:#100a04;background-image:linear-gradient(180deg,rgba(255,194,69,.07),rgba(12,7,3,.82)),repeating-linear-gradient(0deg,rgba(255,214,107,.12) 0 1px,transparent 1px 30px),repeating-linear-gradient(90deg,rgba(255,214,107,.10) 0 1px,transparent 1px 32px);box-shadow:inset 0 0 20px rgba(0,0,0,.55),0 5px 16px rgba(0,0,0,.22)}
+.bt-chart svg{overflow:visible}
+.bt-chart #btArea{fill:url(#btGold);opacity:.9}
+.bt-chart #btLine{stroke:#fff0a6;stroke-width:3.8;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 2px rgba(255,207,83,.9))}
+.bt-bottle{font-size:clamp(25px,7vw,32px);filter:drop-shadow(0 0 4px rgba(255,205,82,.8));transition:left .1s linear,bottom .1s linear;will-change:left,bottom}
+.bt-bottle:not(.crashed){animation:btBob .65s ease-in-out infinite alternate}
+@keyframes btBob{from{transform:translateY(0) rotate(-4deg)}to{transform:translateY(-3px) rotate(4deg)}}
+.bt-crash.show{background:radial-gradient(circle,rgba(255,104,26,.26),rgba(40,8,0,.35));text-shadow:0 0 6px #ffcf6a,0 0 16px #e7781c,0 0 28px #f43}
+@media(max-height:700px){
+ .games.ingame .g-stage:has(.felt)>.felt{gap:7px;padding-top:8px;padding-bottom:8px}
+ .bt-chart{height:clamp(145px,25vh,190px)}
+ .bottle-readout strong{font-size:clamp(38px,9vh,54px)}
+ .felt .sreel{height:clamp(64px,10vh,90px)}
+}
+@media(prefers-reduced-motion:reduce){.bt-bottle:not(.crashed){animation:none!important}}
+
 </style>
 </head>
 <body>
