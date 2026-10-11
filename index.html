@@ -1607,12 +1607,14 @@ body.mode-pro .deck{border-color:rgba(255,211,91,.85)!important;box-shadow:0 30p
       <button class="g-card" data-game="snake"><span class="g-ico">🐍</span><b>Змейка</b><i>Буквы названия песни</i><span class="g-best" id="gBestSnake"></span></button>
       <button class="g-card" data-game="memory"><span class="g-ico">🧠</span><b>Память</b><i>Пары треков</i><span class="g-best" id="gBestMemory"></span></button>
       <button class="g-card" data-game="rhythm"><span class="g-ico">🎵</span><b>Ритм</b><i>Ноты-буквы песни</i><span class="g-best" id="gBestRhythm"></span></button>
+      <button class="g-card" data-game="timekiller"><span class="g-ico">🌀</span><b>Хаос-кликер</b><i>30 секунд хаоса — лови цель!</i><span class="g-best" id="gBestTimekiller"></span></button>
     </div>
     <div class="g-sec">КАЗИНО</div>
     <div class="g-grid">
       <button class="g-card casino" data-game="slots"><span class="g-ico">🎰</span><b>Слоты</b><i>Три семёрки — ×50</i><span class="g-best chipsLbl"></span></button>
       <button class="g-card casino" data-game="roulette"><span class="g-ico">🎡</span><b>Рулетка</b><i>Колесо с 37 секторами</i><span class="g-best chipsLbl"></span></button>
       <button class="g-card casino" data-game="bj"><span class="g-ico">🃏</span><b>Блэкджек</b><i>Набери 21</i><span class="g-best chipsLbl"></span></button>
+      <button class="g-card casino" data-game="bottle"><span class="g-ico">🍾</span><b>Чекушка</b><i>Расти по иксам — забери до взрыва!</i><span class="g-best chipsLbl"></span></button>
     </div>
   </div>
   <div class="g-play" id="gPlay">
@@ -2693,7 +2695,7 @@ const gOver = document.getElementById("gOver"), gOverT = document.getElementById
 const GKEY = "album_games_v1";
 let gBest = { snake: 0, memory: 0, rhythm: 0 };
 try { Object.assign(gBest, JSON.parse(localStorage.getItem(GKEY) || "{}")); } catch(e) {}
-const CASINO = new Set(["slots", "roulette", "bj", "guess"]); let gChips = false;
+const CASINO = new Set(["slots", "roulette", "bj", "bottle", "guess"]); let gChips = false;
 let gSolo = false;
 let gamesOpen = false, gCleanup = null, gRestart = null;
 const GAMES = {};
@@ -2728,7 +2730,7 @@ function showMenu() {
   gTitle.textContent = "ИГРЫ"; gChips = true; gScore.textContent = "💿 " + gBest.chips; bestLabel();
 }
 function startGame(name) {
-  stopGame(); gamesEl.classList.add("ingame"); gChips = CASINO.has(name);
+  stopGame(); document.getElementById("gOverBtn").textContent = "Заново"; document.getElementById("gOverBtn").dataset.action = "restart"; gamesEl.classList.add("ingame"); gChips = CASINO.has(name);
   gRestart = () => { stopGame(); GAMES[name](); };
   GAMES[name]();
 }
@@ -2750,7 +2752,7 @@ try { if (tg && tg.BackButton && tg.BackButton.onClick) { tg.BackButton.offClick
 document.getElementById("gamesChip").addEventListener("click", openGames);
 document.getElementById("guessChip").addEventListener("click", () => { openGames(); gSolo = true; startGame("guess"); });
 document.getElementById("gBack").addEventListener("click", gamesBack);
-document.getElementById("gOverBtn").addEventListener("click", () => { if (gRestart) { gOver.classList.remove("show"); gRestart(); } });
+document.getElementById("gOverBtn").addEventListener("click", () => { const btn = document.getElementById("gOverBtn"); if (btn.dataset.action === "menu") { showMenu(); return; } if (gRestart) { gOver.classList.remove("show"); gRestart(); } });
 document.getElementById("gOverMenu").addEventListener("click", showMenu);
 gMenu.addEventListener("click", e => { const b = e.target.closest(".g-card"); if (b) startGame(b.dataset.game); });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && gamesOpen) gamesBack(); });
@@ -2980,6 +2982,47 @@ GAMES.rhythm = function () {
   gCleanup = () => { clearInterval(timer); document.removeEventListener("keydown", onKey); };
 };
 
+// ── ХАОС-КЛИКЕР: короткая случайная убивалка времени ──
+GAMES.timekiller = function () {
+  gTitle.textContent = "🌀 ХАОС-КЛИКЕР";
+  const W = Math.max(260, Math.min(440, gStage.clientWidth || 320));
+  gStage.innerHTML = '<div class="felt tk-wrap"><div class="slot-top">30 СЕКУНД ХАОСА</div><div class="tk-stats"><span>Попадания <b id="tkScore">0</b></span><span>Осталось <b id="tkTime">30.0</b>с</span></div><div class="tk-arena" id="tkArena" role="group" aria-label="Лови движущуюся цель"><button class="tk-target" id="tkTarget" aria-label="Поймать цель">✦</button></div><div class="cz-msg" id="tkMsg">Нажимай «Старт» и лови цель, пока не вышло время.</div></div>';
+  gCtl.innerHTML = '<button class="g-btn" id="tkStart">Старт</button>';
+  const arena=gStage.querySelector('#tkArena'), target=gStage.querySelector('#tkTarget'), scoreEl=gStage.querySelector('#tkScore'), timeEl=gStage.querySelector('#tkTime'), msg=gStage.querySelector('#tkMsg'), start=gCtl.querySelector('#tkStart');
+  let score=0, left=30, live=false, timer=null, mover=null;
+  function moveTarget(){
+    const aw=arena.clientWidth, ah=arena.clientHeight, tw=target.offsetWidth||58, th=target.offsetHeight||58;
+    target.style.left=Math.max(0,Math.random()*Math.max(1,aw-tw))+'px';
+    target.style.top=Math.max(0,Math.random()*Math.max(1,ah-th))+'px';
+    target.style.transform='rotate('+Math.round(Math.random()*180)+'deg) scale('+(0.82+Math.random()*0.4).toFixed(2)+')';
+  }
+  function finish(){
+    if(!live) return;
+    live=false; clearInterval(timer); clearInterval(mover); timer=mover=null; target.disabled=true; start.disabled=true; start.textContent='Раунд завершён';
+    const reward=score*2;
+    msg.textContent='Время! Попаданий: '+score+'. Начисляем награду…';
+    // Большая, но некликабельная золотая анимация занимает верхнюю половину экрана.
+    const fx=document.createElement('div'); fx.className='tk-reward-fx'; fx.setAttribute('aria-hidden','true');
+    fx.innerHTML='<div class="tk-reward-glow"></div><div class="tk-reward-title">ПОБЕДА!</div><div class="tk-reward-count">+0 💿</div><div class="tk-reward-particles">'+Array.from({length:22},(_,i)=>'<i style="--i:'+i+'">✦</i>').join('')+'</div>';
+    document.body.appendChild(fx);
+    const count=fx.querySelector('.tk-reward-count'); const duration=2200, started=performance.now(); let raf=0;
+    function tick(now){ const t=Math.min(1,(now-started)/duration); const eased=1-Math.pow(1-t,3); count.textContent='+'+Math.floor(reward*eased)+' 💿'; if(t<1){raf=requestAnimationFrame(tick);} else {count.textContent='+'+reward+' 💿'; setTimeout(()=>fx.remove(),850);} }
+    raf=requestAnimationFrame(tick);
+    const credited=earnChips(reward);
+    const overBtn=document.getElementById('gOverBtn'); overBtn.textContent='Далее'; overBtn.dataset.action='menu';
+    showOver('Хаос завершён!', 'Попаданий: '+score+'<br>Награда: +'+credited+' 💿');
+    // Перекрытие результатом выше игрового слоя не должно блокировать анимацию награды.
+  }
+  target.addEventListener('click',()=>{if(!live)return; score++; scoreEl.textContent=score; msg.textContent=['Есть!','Ловко!','Попал!','Не сбавляй!'][rnd(4)]; moveTarget();});
+  start.addEventListener('click',()=>{
+    if(live || start.disabled)return; score=0; left=30; live=true; scoreEl.textContent='0'; timeEl.textContent='30.0'; msg.textContent='Поехали!'; start.disabled=true; target.disabled=false; moveTarget();
+    timer=setInterval(()=>{left=Math.max(0,left-.1);timeEl.textContent=left.toFixed(1);if(left<=0)finish();},100);
+    mover=setInterval(moveTarget,850);
+  });
+  target.disabled=true; moveTarget();
+  gCleanup=()=>{live=false;clearInterval(timer);clearInterval(mover);};
+};
+
 // ═══ общие: скруглённый прямоугольник, награды, заработок за прослушивание ═══
 function rr(g, x, y, w, h, r) {
   g.beginPath();
@@ -3152,6 +3195,42 @@ GAMES.bj = function () {
   gCleanup = () => {};
 };
 
+// ── ЧЕКУШКА: виртуальная crash-игра на фишки, без реальных денег ──
+GAMES.bottle = function () {
+  gTitle.textContent = "🍾 ЧЕКУШКА"; setChips(0);
+  gStage.innerHTML = '<div class="felt bottle-felt"><div class="slot-top">ЧЕКУШКА: ПОЙМАЙ МОМЕНТ</div><div class="cz-song">Виртуальные фишки · забери выигрыш до хлопка</div><div class="bottle-readout"><strong id="btMult">1.00×</strong><span id="btState">Выбери ставку и запускай</span></div><div class="bt-chart" id="btChart"><svg id="btSvg" viewBox="0 0 320 180" preserveAspectRatio="none" aria-label="График множителя"><defs><linearGradient id="btGold" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#b87522" stop-opacity=".12"/><stop offset="1" stop-color="#ffd66b" stop-opacity=".6"/></linearGradient></defs><path id="btArea" d="M 8 170 L 8 170 Z" fill="url(#btGold)"/><polyline id="btLine" points="8,170" fill="none" stroke="#ffd66b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="bt-bottle" id="btIcon">🍾</div><div class="bt-crash" id="btCrash">💥 ХЛОП!</div></div><div class="cz-msg" id="btMsg">Чем дольше держишь, тем выше множитель — и риск хлопка.</div></div>';
+  gCtl.innerHTML='<div class="cz-ctl"><div id="btBets"></div><button class="g-btn" id="btGo">Поднять чекушку</button><button class="g-btn ghost" id="btCash" disabled>Забрать ×1.00</button></div>';
+  const st={bet:10,lock:false}; mkBets(gCtl.querySelector('#btBets'),st);
+  const go=gCtl.querySelector('#btGo'), cash=gCtl.querySelector('#btCash'), multEl=gStage.querySelector('#btMult'), stateEl=gStage.querySelector('#btState'), msg=gStage.querySelector('#btMsg'), line=gStage.querySelector('#btLine'), area=gStage.querySelector('#btArea'), icon=gStage.querySelector('#btIcon'), crashEl=gStage.querySelector('#btCrash');
+  let running=false, crashed=false, startAt=0, mult=1, bet=0, timer=null, points=[];
+  function paint(){
+    const y=Math.max(12,170-(mult-1)*35); points.push(y); if(points.length>74)points.shift();
+    const step=302/Math.max(1,points.length-1), pts=points.map((py,i)=>(8+i*step)+','+py).join(' '), x=8+(points.length-1)*step;
+    line.setAttribute('points',pts); area.setAttribute('d','M 8 170 L '+pts.replace(/ /g,' L ')+' L '+x+' 170 Z');
+    icon.style.left=(Math.max(3,Math.min(88,(x/320)*100))+'%'); icon.style.bottom=(Math.max(4,Math.min(78,((170-y)/180)*100))+'%');
+  }
+  function endCrash(){
+    running=false;crashed=true;clearInterval(timer);timer=null;cash.disabled=true;go.disabled=false;go.textContent='Попробовать снова';st.lock=false;
+    icon.classList.add('crashed');crashEl.classList.add('show');stateEl.textContent='Множитель лопнул';msg.textContent='Хлоп! Ставка '+bet+' 💿 потеряна. В следующий раз забирай вовремя.';gScore.textContent='💿 '+gBest.chips;
+  }
+  function cashOut(){
+    if(!running||crashed)return;running=false;clearInterval(timer);timer=null;const payout=Math.floor(bet*mult);setChips(payout);cash.disabled=true;go.disabled=false;go.textContent='Новый раунд';st.lock=false;stateEl.textContent='Забрано: '+payout+' 💿';msg.textContent='Забрал на ×'+mult.toFixed(2)+' — чистый результат '+(payout-bet>=0?'+':'')+(payout-bet)+' 💿';multEl.classList.add('bt-win');
+  }
+  function launch(){
+    if(running)return;
+    if(go.dataset.broke){loan(go,'Поднять чекушку');return;}
+    bet=Math.min(st.bet,gBest.chips);if(bet<1){brokeCheck(go,'Поднять чекушку');return;}
+    setChips(-bet);running=true;crashed=false;mult=1;points=[];startAt=performance.now();st.lock=true;go.disabled=true;cash.disabled=false;icon.classList.remove('crashed');crashEl.classList.remove('show');multEl.classList.remove('bt-win');line.setAttribute('points','8,170');area.setAttribute('d','M 8 170 L 8 170 Z');icon.style.left='3%';icon.style.bottom='4%';msg.textContent='Решай сам, когда забирать!';stateEl.textContent='Риск растёт каждую секунду';
+    timer=setInterval(()=>{
+      const elapsed=(performance.now()-startAt)/1000; mult=Math.exp(elapsed*.19);mult=Math.min(mult,1000);multEl.textContent=mult.toFixed(2)+'×';cash.textContent='Забрать ×'+mult.toFixed(2);paint();
+      const hazard=Math.min(.16,(.012+elapsed*.006)*.1);
+      if(Math.random()<hazard)endCrash();
+    },100);
+  }
+  go.addEventListener('click',launch);cash.addEventListener('click',cashOut);brokeCheck(go,'Поднять чекушку');
+  gCleanup=()=>{running=false;clearInterval(timer);timer=null;};
+};
+
 // ── УГАДАЙ ПЕСНЮ ──
 GAMES.guess = function () {
   gTitle.textContent = "🎧 УГАДАЙКА"; setChips(0);
@@ -3313,3 +3392,40 @@ setTimeout(() => { if (!splashDone) revealEntry(); }, 9000);
 </script>
 </body>
 </html>
+
+
+/* Золотая выдача награды: эффект на верхнюю половину экрана, без перехвата касаний. */
+.tk-reward-fx{position:fixed;z-index:1200;inset:0 0 auto;height:50vh;min-height:260px;overflow:hidden;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#fff1b4;background:radial-gradient(ellipse at 50% 100%,rgba(245,177,40,.28),transparent 68%);animation:tk-reward-in .35s ease-out both}
+.tk-reward-glow{position:absolute;width:min(80vw,520px);height:min(80vw,520px);border-radius:50%;background:radial-gradient(circle,rgba(255,205,75,.22),rgba(255,174,30,.07) 42%,transparent 70%);animation:tk-reward-pulse .9s ease-in-out infinite alternate}
+.tk-reward-title,.tk-reward-count{position:relative;font-family:'Bebas Neue',sans-serif;font-weight:900;text-align:center;text-shadow:0 0 12px rgba(255,192,48,.9),0 0 36px rgba(255,169,20,.75);letter-spacing:.08em}
+.tk-reward-title{font-size:clamp(38px,9vw,76px);animation:tk-reward-pop .55s cubic-bezier(.2,1.5,.4,1) both}
+.tk-reward-count{font-size:clamp(30px,7vw,58px);color:#ffe18a;min-height:1em}
+.tk-reward-particles{position:absolute;inset:0;overflow:hidden}
+.tk-reward-particles i{position:absolute;left:calc((var(--i)*47 + 5)*1%);top:100%;font-style:normal;color:#ffe38a;font-size:clamp(13px,3vw,25px);text-shadow:0 0 12px #ffb51f;animation:tk-reward-rise 1.6s ease-out calc(var(--i)*.035s) both}
+@keyframes tk-reward-in{from{opacity:0}to{opacity:1}}
+@keyframes tk-reward-pop{from{transform:scale(.55);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes tk-reward-pulse{from{transform:scale(.75);opacity:.55}to{transform:scale(1.08);opacity:1}}
+@keyframes tk-reward-rise{to{transform:translateY(-65vh) rotate(240deg);opacity:0}}
+@media(prefers-reduced-motion:reduce){.tk-reward-fx,.tk-reward-title,.tk-reward-glow,.tk-reward-particles i{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
+/* Новые игры: хаос-кликер и crash-игра «Чекушка» */
+.tk-wrap{gap:12px}
+.tk-stats{display:flex;justify-content:space-between;width:100%;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cream)}
+.tk-stats b{color:#ffd66b}
+.tk-arena{position:relative;width:100%;height:clamp(230px,38vh,330px);overflow:hidden;border:1px solid rgba(255,214,107,.42);border-radius:16px;background:radial-gradient(circle at 50% 50%,rgba(255,194,69,.13),transparent 70%),repeating-linear-gradient(0deg,rgba(255,214,107,.045) 0 1px,transparent 1px 24px),repeating-linear-gradient(90deg,rgba(255,214,107,.045) 0 1px,transparent 1px 24px),#160d05;touch-action:manipulation}
+.tk-target{position:absolute;left:20px;top:20px;width:58px;height:58px;border-radius:50%;border:1px solid #fff0a6;color:#402306;font-size:30px;background:radial-gradient(circle at 35% 25%,#fff6bd,#ffc33e 55%,#a65d12);box-shadow:0 0 22px rgba(255,194,69,.65),inset 0 2px 5px rgba(255,255,255,.7);transition:left .12s,top .12s;cursor:pointer;touch-action:manipulation}
+.tk-target:disabled{opacity:.5}
+.bottle-felt{gap:10px;overflow:hidden}
+.bottle-readout{display:flex;flex-direction:column;align-items:center;gap:3px}
+.bottle-readout strong{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,10vw,62px);line-height:1;color:#ffdc77;text-shadow:0 0 10px rgba(255,196,64,.65),0 0 28px rgba(255,174,40,.35);font-variant-numeric:tabular-nums}
+.bottle-readout strong.bt-win{animation:btGlow .55s ease-in-out infinite alternate}
+.bottle-readout span{font-size:11px;color:var(--cream);opacity:.75;text-align:center}
+@keyframes btGlow{to{text-shadow:0 0 16px #fff0a6,0 0 36px #ffbf3f;transform:scale(1.04)}}
+.bt-chart{position:relative;width:100%;height:clamp(170px,28vh,220px);overflow:hidden;border-radius:14px;border:1px solid rgba(255,214,107,.35);background:linear-gradient(180deg,rgba(255,194,69,.08),rgba(12,7,3,.7)),repeating-linear-gradient(0deg,rgba(255,214,107,.07) 0 1px,transparent 1px 30px),repeating-linear-gradient(90deg,rgba(255,214,107,.06) 0 1px,transparent 1px 32px)}
+.bt-chart svg{position:absolute;inset:0;width:100%;height:100%}
+.bt-bottle{position:absolute;left:3%;bottom:4%;font-size:27px;filter:drop-shadow(0 0 10px rgba(255,205,82,.65));transition:left .1s,bottom .1s;z-index:2}
+.bt-bottle.crashed{animation:btPop .45s ease-in forwards}
+@keyframes btPop{to{transform:scale(1.7) rotate(35deg);opacity:.15;filter:blur(3px)}}
+.bt-crash{position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,9vw,54px);letter-spacing:.12em;color:#ffcf6a;text-shadow:0 0 14px #e7781c,0 0 32px #f43;z-index:3;background:rgba(40,8,0,.18)}
+.bt-crash.show{display:flex;animation:btFlash .22s ease-in-out 3 alternate}
+@keyframes btFlash{to{background:rgba(255,90,20,.24)}}
