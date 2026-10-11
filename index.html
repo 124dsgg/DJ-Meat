@@ -1315,6 +1315,119 @@ body{background-image:radial-gradient(110% 46% at 50% -8%,rgba(var(--arg),.2),tr
 .gq-lvl-bars{display:flex;gap:3px;align-items:center;height:18px}
 .gq-lvl-bars u{width:4px;border-radius:2px;background:var(--amber);display:block}
 .gq-lvl-m{font:800 17px var(--f-d);color:var(--amber);flex-shrink:0}
+
+
+/* ══════════ HONEY / DEEP COCOA RETRO POLISH ══════════ */
+:root{
+  --bg:#100903;
+  --panel:#211306;
+  --panel2:#2b1909;
+  --panel3:#38200b;
+  --amber:#f2bd45;
+  --amber-dim:rgba(242,189,69,.19);
+  --pro:#ffd15a;
+  --pro-dim:rgba(255,209,90,.2);
+  --cream:#fff0d1;
+  --muted:#b08a55;
+  --line:#39220d;
+  --line2:#5a3715;
+  --arg:242,189,69;
+}
+body,
+body.mode-pro{
+  background-color:var(--bg);
+  background-image:radial-gradient(ellipse at 50% -8%,rgba(242,189,69,.2),transparent 62%),radial-gradient(ellipse at 100% 100%,rgba(111,57,18,.19),transparent 58%);
+}
+/* Albums share one warm honey palette; album changes no longer recolor the games. */
+body:has(.albumnav [data-album="old-money"].current),
+body:has(.albumnav [data-album="putaria-best"].current),
+body:has(.albumnav [data-album="chanson"].current),
+body:has(.albumnav [data-album="newgen"].current),
+body:has(.albumnav [data-album="lost-media"].current){--amber:#f2bd45;--arg:242,189,69}
+.albumnav button[data-album="old-money"],
+.albumnav button[data-album="putaria-best"],
+.albumnav button[data-album="chanson"],
+.albumnav button[data-album="newgen"],
+.albumnav button[data-album="lost-media"]{--c:#eab24a}
+.albumnav button[data-album="putaria-best"]{--c:#d99a43}
+.albumnav button[data-album="chanson"]{--c:#c98b43}
+.albumnav button[data-album="newgen"]{--c:#ffd36a}
+.albumnav button[data-album="lost-media"]{--c:#b87535}
+
+/* Music guessing and every mini-game use the same honey/cocoa skin, regardless of track. */
+.games{
+  --g-rgb:242,189,69 !important;
+  --g-bg:#100903 !important;
+  --amber:#f2bd45;
+  --panel:#211306;--panel2:#2b1909;--panel3:#38200b;
+  --line:#39220d;--line2:#5a3715;
+  background-color:#100903 !important;
+  background-image:radial-gradient(ellipse at 18% 0%,rgba(242,189,69,.23),transparent 55%),radial-gradient(ellipse at 88% 100%,rgba(117,65,20,.24),transparent 55%) !important;
+  color:var(--cream);
+}
+.games .g-title,.games .g-sec,.games .g-best,.games .gq-lvl-m,.games .gq-q.win{color:#f2bd45}
+.games .g-card,.games .g-mini,.games .g-over-box{background:linear-gradient(145deg,#38210d,#1b1006)!important;border-color:#67451b;box-shadow:inset 0 1px rgba(255,226,157,.07),0 10px 24px rgba(0,0,0,.24)}
+.games .g-card:active,.games .gq-lvl:active{border-color:#f2bd45;box-shadow:0 0 20px rgba(242,189,69,.2)}
+.games .g-btn,.games .g-mini-b.main,.games .gq-k,.games .g-lane.hit,.games .g-lane:active,.games .g-dpad button:active,.games .bet.on{background:linear-gradient(135deg,#ffe08a,#e7a92e 55%,#bb761c)!important;color:#271504!important;border-color:#ffdc76!important;box-shadow:0 4px 18px rgba(242,189,69,.2)}
+.games .gq-disc .gq-ring .fg{stroke:#f2bd45}
+.games .gq-v{box-shadow:0 0 0 2px rgba(255,218,122,.38),0 0 30px rgba(242,189,69,.24),0 10px 22px -8px #000}
+.games .gq-lvl,.games .gq-opt,.games .gq-lvl-bars u{border-color:rgba(242,189,69,.3)}
+.games .gq .gq-opt{background:linear-gradient(145deg,rgba(242,189,69,.12),rgba(40,23,8,.8));border-color:rgba(242,189,69,.28)}
+.games .gq .gq-opt.ok{background:rgba(242,189,69,.2);border-color:#f2bd45}
+.games .gq .gq-opt.bad{background:rgba(133,74,25,.3);border-color:#b87535}
+.games .gq .gq-opt.bad .gq-k{background:#8a5524;color:#fff0d1}
+.games .mem-card.done{background:rgba(242,189,69,.18);border-color:#d7a746}
+.games .rw.green{background:#7a4c20}
+
+/* Pro+ becomes a premium gold edition: bright metal, moving glints, aura and depth. */
+.mode-bar{
+  position:relative;isolation:isolate;overflow:hidden;
+  background:linear-gradient(115deg,#6f420b 0%,#d58e19 16%,#ffe99a 31%,#f5bd3c 45%,#a9650d 62%,#ffdc70 78%,#8a4e08 100%) !important;
+  background-size:240% 100% !important;
+  border:1px solid #ffe9a0 !important;
+  box-shadow:0 0 0 1px rgba(255,221,116,.24),0 0 16px rgba(255,190,45,.52),0 0 36px rgba(255,174,25,.27),inset 0 1px rgba(255,255,255,.55) !important;
+  animation:pro-medal-sweep 3s linear infinite,pro-medal-pulse 2s ease-in-out infinite !important;
+}
+.mode-bar::after{
+  content:"";position:absolute;z-index:-1;inset:-80% auto -80% -35%;width:28%;transform:rotate(18deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.82),rgba(255,247,201,.25),transparent);
+  animation:pro-glint 2.5s ease-in-out infinite;pointer-events:none;
+}
+.mode-text{color:#2a1603!important;text-shadow:0 1px rgba(255,255,255,.3);font-weight:900!important}
+.mode-dot{background:#fff1a8!important;box-shadow:0 0 7px #fff1a8,0 0 15px #ffbf32!important;animation:pro-dot-glow 1.2s ease-in-out infinite alternate!important}
+.pro-ribbon{
+  position:relative;overflow:hidden;
+  color:#2a1603!important;
+  background:linear-gradient(120deg,#9b5d0a 0%,#f8c94d 16%,#fff1ad 29%,#e9a91f 43%,#fff0a0 57%,#b36a0c 73%,#ffdb67 88%,#a45d08 100%)!important;
+  background-size:260% 100%!important;
+  border:1px solid rgba(255,239,170,.95)!important;
+  border-radius:7px!important;padding:3px 9px!important;
+  text-shadow:0 1px rgba(255,255,255,.36);
+  box-shadow:0 0 0 1px rgba(255,193,48,.35),0 0 10px rgba(255,185,35,.7),0 0 22px rgba(255,173,22,.4),inset 0 1px rgba(255,255,255,.65)!important;
+  animation:pro-ribbon-metal 2.2s linear infinite,pro-ribbon-float 2.8s ease-in-out infinite!important;
+}
+.track.pro-track{
+  position:relative;
+  background:linear-gradient(100deg,rgba(255,198,55,.17),rgba(125,72,12,.1) 52%,rgba(255,221,112,.07))!important;
+  box-shadow:inset 3px 0 0 #ffcf4f,0 0 0 1px rgba(255,200,65,.08),0 0 18px rgba(255,183,34,.08)!important;
+}
+.track.pro-track::after{
+  content:"";position:absolute;pointer-events:none;inset:0;border-radius:inherit;
+  background:linear-gradient(105deg,transparent 20%,rgba(255,226,127,.1) 45%,transparent 66%);
+  background-size:220% 100%;animation:pro-track-glimmer 4s linear infinite;
+}
+.track.pro-track .tnum,.track.pro-track.active .ttitle-text{color:#ffd76a!important;text-shadow:0 0 12px rgba(255,190,40,.36)}
+.track.pro-track.active{background:linear-gradient(100deg,rgba(255,205,73,.28),rgba(132,77,13,.16),rgba(255,228,135,.11))!important;box-shadow:inset 3px 0 0 #fff0a0,0 0 22px rgba(255,188,40,.15)!important}
+body.mode-pro .deck{border-color:rgba(255,211,91,.85)!important;box-shadow:0 30px 60px -34px #000,0 0 0 1px rgba(255,210,86,.3),0 0 32px rgba(255,180,30,.18),inset 0 1px 0 rgba(255,245,196,.16)!important}
+@keyframes pro-medal-sweep{0%{background-position:100% 0}100%{background-position:-140% 0}}
+@keyframes pro-medal-pulse{0%,100%{filter:brightness(1);transform:translateY(0)}50%{filter:brightness(1.14);transform:translateY(-1px)}}
+@keyframes pro-glint{0%,15%{left:-35%;opacity:0}30%{opacity:1}65%,100%{left:130%;opacity:0}}
+@keyframes pro-dot-glow{from{filter:brightness(.9);transform:scale(.92)}to{filter:brightness(1.5);transform:scale(1.12)}}
+@keyframes pro-ribbon-metal{0%{background-position:100% 0}100%{background-position:-160% 0}}
+@keyframes pro-ribbon-float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-1px) scale(1.045)}}
+@keyframes pro-track-glimmer{0%{background-position:150% 0}100%{background-position:-120% 0}}
+@media(prefers-reduced-motion:reduce){.mode-bar,.mode-bar::after,.pro-ribbon,.track.pro-track::after,.mode-dot{animation:none!important}}
+
 </style>
 </head>
 <body>
