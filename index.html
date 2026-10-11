@@ -1533,14 +1533,13 @@ body.mode-pro .deck{border-color:rgba(255,211,91,.85)!important;box-shadow:0 30p
 }
 
 
-/* v1.6: clearly visible but lightweight gold sweep across every Pro+ song row */
-.track.pro-track{position:relative;isolation:isolate;overflow:hidden;background-color:rgba(111,67,10,.14)!important;background-image:linear-gradient(105deg,rgba(255,190,35,.10) 0%,rgba(255,214,91,.20) 22%,rgba(119,69,7,.12) 42%,rgba(255,239,166,.32) 50%,rgba(169,103,12,.16) 62%,rgba(255,194,35,.12) 100%)!important;background-size:320% 100%!important;animation:pro-row-sheen-v16 3.2s linear infinite!important;}
-.track.pro-track::after{content:""!important;display:block!important;position:absolute!important;z-index:0!important;pointer-events:none!important;inset:0!important;border:0!important;border-radius:inherit!important;background:linear-gradient(105deg,transparent 0%,transparent 35%,rgba(255,246,196,.04) 42%,rgba(255,239,158,.55) 49%,rgba(255,255,226,.72) 51%,rgba(255,202,66,.25) 57%,transparent 66%,transparent 100%)!important;background-size:320% 100%!important;animation:pro-row-glint-v16 3.2s linear infinite!important;}
+/* v1.6: a clearly visible gold glint travels from the left edge to the right edge of every Pro+ row */
+.track.pro-track{position:relative!important;isolation:isolate;overflow:hidden;background:linear-gradient(100deg,rgba(255,190,35,.13),rgba(125,72,12,.10) 48%,rgba(255,205,65,.16))!important;box-shadow:inset 3px 0 0 #ffcf4f,0 0 0 1px rgba(255,200,65,.08)!important;}
+.track.pro-track::after{content:""!important;display:block!important;position:absolute!important;z-index:2!important;pointer-events:none!important;top:-5%!important;bottom:-5%!important;left:0!important;width:42%!important;border:0!important;border-radius:inherit!important;background:linear-gradient(105deg,transparent 0%,rgba(255,215,92,.12) 22%,rgba(255,239,166,.72) 47%,rgba(255,255,230,.98) 52%,rgba(255,191,40,.55) 64%,transparent 100%)!important;opacity:0;transform:translateX(-115%);animation:pro-row-edge-sweep 2.8s cubic-bezier(.45,0,.35,1) infinite!important;}
 .track.pro-track>*{position:relative;z-index:1}
-@keyframes pro-row-sheen-v16{0%{background-position:100% 0}100%{background-position:-220% 0}}
-@keyframes pro-row-glint-v16{0%{background-position:120% 0;opacity:.15}15%{opacity:.95}65%{opacity:.9}100%{background-position:-220% 0;opacity:.15}}
-.app-version{margin:12px auto 0;font:500 9px/1.2 'JetBrains Mono',monospace;letter-spacing:.16em;color:rgba(218,180,100,.48);text-transform:uppercase}
-@media(prefers-reduced-motion:reduce){.track.pro-track,.track.pro-track::after{animation:none!important}}
+@keyframes pro-row-edge-sweep{0%{transform:translateX(-115%);opacity:0}8%{opacity:1}82%{opacity:.95}100%{transform:translateX(250%);opacity:0}}
+.app-version{position:absolute;right:10px;bottom:8px;margin:0;font:500 9px/1 'JetBrains Mono',monospace;letter-spacing:.06em;color:rgba(218,180,100,.48);text-transform:none;pointer-events:none}
+@media(prefers-reduced-motion:reduce){.track.pro-track::after{animation:none!important;display:none!important}}
 
 </style>
 </head>
@@ -1558,6 +1557,7 @@ body.mode-pro .deck{border-color:rgba(255,211,91,.85)!important;box-shadow:0 30p
     </div>
     <div class="splash-skip hidden" id="splashSkip">Пропустить →</div>
   </div>
+  <div class="app-version">1.6</div>
 </div>
 
 <!-- ══════════ ENTRY SCREEN ══════════ -->
@@ -1566,8 +1566,6 @@ body.mode-pro .deck{border-color:rgba(255,211,91,.85)!important;box-shadow:0 30p
     <div class="entry-mini-vinyl"></div>
     <div class="entry-title">АЛЬБОМ</div>
     <div class="entry-sub">DJ Мясо × DJ Путария</div>
-    <div class="app-version">VERSION 1.6</div>
-
     <button class="entry-main-btn" id="enterMainBtn">Слушать</button>
     <button class="entry-secret-link" id="secretLinkBtn">Ты свой? 👀</button>
 
