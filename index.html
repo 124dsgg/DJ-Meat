@@ -1668,7 +1668,7 @@ body.mode-pro .deck{border-color:rgba(255,211,91,.85)!important;box-shadow:0 30p
     <button class="entry-secret-link" id="secretLinkBtn">Ты свой? 👀</button>
 
     <div class="entry-pw hidden" id="entryPw">
-      <input type="password" inputmode="numeric" class="pw-input" id="pwInput" placeholder="код" autocomplete="off">
+      <input type="text" inputmode="text" enterkeyhint="done" class="pw-input" id="pwInput" placeholder="код" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" style="-webkit-text-security:disc;text-security:disc">
       <button class="pw-back" id="pwBack">← Назад</button>
     </div>
   </div>
@@ -1831,6 +1831,7 @@ body.mode-pro .deck{border-color:rgba(255,211,91,.85)!important;box-shadow:0 30p
       <button class="g-card casino" data-game="dice"><span class="g-ico suit red">♡</span><b>Кости</b><i>Больше, меньше или ровно 7</i><span class="g-best chipsLbl"></span></button>
       <button class="g-card casino" data-game="mines"><span class="g-ico suit red">♢</span><b>Мины</b><i>Открывай ромбы — не нарвись</i><span class="g-best chipsLbl"></span></button>
       <button class="g-card casino" data-game="wheel"><span class="g-ico suit">♧</span><b>Колесо удачи</b><i>До ×10 — крути и надейся</i><span class="g-best chipsLbl"></span></button>
+      <button class="g-card casino" data-game="plane"><span class="g-ico suit">✈</span><b>Самолётик</b><i>Взлёт с авианосца — лови иксы и сядь на палубу</i><span class="g-best chipsLbl"></span></button>
       <button class="g-card casino" data-game="pvp" style="grid-column:1/-1"><span class="g-ico suit red">⚔</span><b>PvP · Пинг-понг</b><i>Вдвоём на одном телефоне — играете на 💿 (откроется в горизонтальном режиме)</i></button>
     </div>
   </div>
@@ -2917,7 +2918,7 @@ const gOver = document.getElementById("gOver"), gOverT = document.getElementById
 const GKEY = "album_games_v1";
 let gBest = { snake: 0, memory: 0, rhythm: 0 };
 try { Object.assign(gBest, JSON.parse(localStorage.getItem(GKEY) || "{}")); } catch(e) {}
-const CASINO = new Set(["slots", "roulette", "bj", "bottle", "guess", "coin", "dice", "mines", "wheel"]); let gChips = false;
+const CASINO = new Set(["slots", "roulette", "bj", "bottle", "guess", "coin", "dice", "mines", "wheel", "plane"]); let gChips = false;
 let gSolo = false;
 let gamesOpen = false, gCleanup = null, gRestart = null;
 // Секретный код kabildjon переключает «режим удачи»: шансы на выигрыш во всех играх казино становятся очень высокими
@@ -3863,6 +3864,139 @@ pvC.addEventListener("pointermove", e => { const side = pv.touches[e.pointerId];
 const pvUp = e => { delete pv.touches[e.pointerId]; };
 pvC.addEventListener("pointerup", pvUp); pvC.addEventListener("pointercancel", pvUp);
 document.addEventListener("keydown", e => { if (e.key === "Escape" && pvpOpen) closePvp(); });
+
+// ── САМОЛЁТИК: взлёт с авианосца, в небе висят ×2 / ×5 / ×0.5, посадка на палубу = выигрыш, вода = проигрыш ──
+// Исход выбирается заранее (подкрутка): ищется траектория, которая заканчивается нужным исходом.
+GAMES.plane = function () {
+  gTitle.textContent = "✈ САМОЛЁТИК"; setChips(0);
+  const WW = 1000, WH = 760, G = 700, DT = 1 / 60, DECK0 = 760, DECK1 = 975, DECKY = 640, WATER = 686, BR = 36;
+  const TYPES = { 2: { m: 2, push: 470, c1: "#ffe08a", c2: "#e7a92e" }, 5: { m: 5, push: 620, c1: "#ff9ad5", c2: "#b3267a" }, 0.5: { m: 0.5, push: 330, c1: "#8fb8ff", c2: "#2b4f9e" } };
+  const w = Math.max(240, Math.min(gStage.clientWidth || 340, 440));
+  const k = Math.min(w / WW, Math.max(120, (gStage.clientHeight || 400) - 150) / WH), CW = Math.round(WW * k), CH = Math.round(WH * k);
+  gStage.innerHTML = '<div class="felt" id="plFelt"><div class="cz-song"></div><div id="plBox" style="line-height:0"></div><div class="cz-msg" id="czMsg">Взлетай, лови иксы и садись на палубу правого авианосца. Упал в воду — ставка сгорает</div></div>';
+  gStage.querySelector(".cz-song").textContent = themeLine();
+  const { cv, g } = mkCanvas(CW, CH); cv.style.borderRadius = "14px"; cv.style.border = "1px solid rgba(242,189,69,.5)"; gStage.querySelector("#plBox").appendChild(cv);
+  const msg = gStage.querySelector("#czMsg");
+  gCtl.innerHTML = '<div class="cz-ctl"><div id="czBets"></div><button class="g-btn" id="czGo">Взлёт</button></div>';
+  const st = { bet: 10, lock: false }; mkBets(gCtl.querySelector("#czBets"), st);
+  const go = gCtl.querySelector("#czGo"); brokeCheck(go, "Взлёт");
+
+  function genBoosters() {
+    const wts = gLucky ? [[2, 45], [5, 40], [0.5, 15]] : gCursed ? [[0.5, 70], [2, 25], [5, 5]] : [[2, 40], [0.5, 40], [5, 20]];
+    const pickT = () => { let r = Math.random() * 100; for (const t of wts) { if ((r -= t[1]) < 0) return t[0]; } return 2; };
+    const n = 6 + rnd(3), bs = [];
+    for (let tries = 0; bs.length < n && tries < 80; tries++) {
+      const x = 250 + Math.random() * 640, y = 90 + Math.random() * 390;
+      if (bs.every(b => Math.hypot(b.x - x, b.y - y) > 95)) bs.push({ x, y, t: pickT() });
+    }
+    return bs;
+  }
+  function sim(bs, vx0, vy0) {
+    let x = 100, y = 632, vx = vx0, vy = vy0, mult = 1; const pts = [], hits = [], used = bs.map(() => false); let win = false;
+    for (let i = 0; i < 1600; i++) {
+      pts.push({ x, y, vx, vy, mult });
+      vy += G * DT; x += vx * DT; y += vy * DT;
+      for (let j = 0; j < bs.length; j++) {
+        if (used[j]) continue;
+        if (Math.hypot(x - bs[j].x, y - bs[j].y) < BR + 14) { used[j] = true; const T = TYPES[bs[j].t]; mult = Math.min(40, mult * T.m); vy = -T.push; hits.push({ i, j, m: mult }); }
+      }
+      if (y >= DECKY && vy > 0 && x >= DECK0 && x <= DECK1) { y = DECKY - 6; pts.push({ x, y, vx, vy: 0, mult }); win = true; break; }
+      if (y >= WATER) { pts.push({ x, y: WATER, vx, vy, mult }); break; }
+      if (x > WW + 200) { pts.push({ x, y: WATER, vx, vy, mult }); break; }
+    }
+    return { pts, hits, mult, win };
+  }
+  function plan() {
+    const want = Math.random() < (gLucky ? 0.8 : gCursed ? 0.02 : 0.2);
+    const lim = gLucky ? [2, 40] : gCursed ? [0.25, 1.2] : (Math.random() < 0.85 ? [0.25, 2.2] : [0.25, 40]);
+    let best = null;
+    for (let a = 0; a < 700; a++) {
+      const bs = genBoosters(), r = sim(bs, 250 + Math.random() * 280, -(520 + Math.random() * 260));
+      r.bs = bs; best = r;
+      if (r.win === want && (!want || (r.hits.length >= 1 && r.mult >= lim[0] && r.mult <= lim[1]))) return r;
+    }
+    for (let a = 0; a < 400; a++) { const bs = genBoosters(), r = sim(bs, 250 + Math.random() * 280, -(520 + Math.random() * 260)); r.bs = bs; if (r.win === want) return r; }
+    return best;
+  }
+
+  const CLOUDS = [[120, 120, 1], [520, 70, .8], [800, 170, 1.2], [330, 250, .7]];
+  let run = null, raf = 0, idleT = 0;
+  function plane(x, y, ang) {
+    g.save(); g.translate(x, y); g.rotate(ang);
+    g.fillStyle = "#fff0d1"; g.beginPath(); g.ellipse(0, 0, 30, 8, 0, 0, 6.2832); g.fill();
+    g.fillStyle = "#ff6a3d"; g.beginPath(); g.moveTo(-26, 0); g.lineTo(-38, -16); g.lineTo(-30, -16); g.lineTo(-16, 0); g.closePath(); g.fill();
+    g.fillStyle = "#f2bd45"; g.beginPath(); g.moveTo(-4, 0); g.lineTo(-14, 20); g.lineTo(-2, 20); g.lineTo(12, 0); g.closePath(); g.fill();
+    g.fillStyle = "#6fb3ff"; g.beginPath(); g.ellipse(12, -3, 7, 4, 0, 0, 6.2832); g.fill();
+    g.restore();
+  }
+  function carrier(x0, x1, land) {
+    g.fillStyle = "#3a4452"; g.beginPath(); g.moveTo(x0 - 18, DECKY); g.lineTo(x1 + 22, DECKY); g.lineTo(x1 - 14, WATER + 20); g.lineTo(x0 + 12, WATER + 20); g.closePath(); g.fill();
+    g.fillStyle = "#59667a"; g.fillRect(x0 - 18, DECKY - 4, x1 - x0 + 40, 10);
+    g.strokeStyle = "rgba(255,255,255,.7)"; g.lineWidth = 3; g.setLineDash([16, 12]); g.beginPath(); g.moveTo(x0, DECKY - 1); g.lineTo(x1, DECKY - 1); g.stroke(); g.setLineDash([]);
+    if (land) { const on = Math.floor(performance.now() / 350) % 2; for (let i = 0; i < 7; i++) { g.fillStyle = (i + on) % 2 ? "#ff5a3d" : "#ffe08a"; g.beginPath(); g.arc(x0 + 10 + i * ((x1 - x0 - 20) / 6), DECKY - 8, 4, 0, 6.2832); g.fill(); } }
+    else { g.fillStyle = "#2c3541"; g.fillRect(x0 + 90, DECKY - 38, 34, 38); g.fillStyle = "#ffe08a"; g.fillRect(x0 + 98, DECKY - 30, 18, 6); }
+  }
+  function draw(f) {
+    const T = performance.now() / 1000;
+    g.save(); g.scale(CW / WW, CH / WH);
+    const sky = g.createLinearGradient(0, 0, 0, WATER); sky.addColorStop(0, "#142456"); sky.addColorStop(0.55, "#ff8a4d"); sky.addColorStop(1, "#ffd6a0");
+    g.fillStyle = sky; g.fillRect(0, 0, WW, WATER);
+    g.fillStyle = "rgba(255,244,200,.9)"; g.beginPath(); g.arc(840, 520, 60, 0, 6.2832); g.fill();
+    g.fillStyle = "rgba(255,255,255,.22)"; CLOUDS.forEach(c => { g.beginPath(); g.ellipse(c[0] + Math.sin(T * 0.2 + c[0]) * 12, c[1], 70 * c[2], 20 * c[2], 0, 0, 6.2832); g.fill(); });
+    const sea = g.createLinearGradient(0, WATER - 10, 0, WH); sea.addColorStop(0, "#14558a"); sea.addColorStop(1, "#06182c");
+    g.fillStyle = sea; g.fillRect(0, WATER - 6, WW, WH - WATER + 6);
+    g.strokeStyle = "rgba(255,255,255,.25)"; g.lineWidth = 2; g.beginPath();
+    for (let x = 0; x <= WW; x += 20) { const y = WATER + 4 + Math.sin(x * 0.04 + T * 2) * 4; x ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke();
+    carrier(10, 190, false); carrier(DECK0, DECK1, true);
+    if (run) {
+      run.bs.forEach((b, j) => {
+        const hitInfo = run.hitAt[j], T2 = TYPES[b.t];
+        if (hitInfo !== undefined && f >= hitInfo) { const a = Math.min(1, (f - hitInfo) / 24); g.strokeStyle = "rgba(255,240,170," + (1 - a).toFixed(2) + ")"; g.lineWidth = 5; g.beginPath(); g.arc(b.x, b.y, BR + a * 50, 0, 6.2832); g.stroke(); return; }
+        const gr = g.createRadialGradient(b.x - 10, b.y - 10, 4, b.x, b.y, BR); gr.addColorStop(0, T2.c1); gr.addColorStop(1, T2.c2);
+        g.save(); g.shadowColor = T2.c1; g.shadowBlur = 18; g.fillStyle = gr; g.beginPath(); g.arc(b.x, b.y + Math.sin(T * 2 + j) * 3, BR, 0, 6.2832); g.fill(); g.restore();
+        g.fillStyle = "#1a1006"; g.font = "800 28px 'Unbounded',sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("×" + b.t, b.x, b.y + 2 + Math.sin(T * 2 + j) * 3);
+      });
+      const i = Math.min(f, run.pts.length - 1), p = run.pts[i];
+      g.strokeStyle = "rgba(255,255,255,.5)"; g.lineWidth = 4; g.lineCap = "round"; g.beginPath();
+      for (let q = Math.max(0, i - 40); q <= i; q++) q === Math.max(0, i - 40) ? g.moveTo(run.pts[q].x, run.pts[q].y) : g.lineTo(run.pts[q].x, run.pts[q].y); g.stroke();
+      const last = f >= run.pts.length - 1;
+      if (last && !run.win) { const a = Math.min(1, (f - run.pts.length + 1) / 40); g.strokeStyle = "rgba(255,255,255," + (1 - a).toFixed(2) + ")"; g.lineWidth = 4; for (let q = 0; q < 3; q++) { g.beginPath(); g.ellipse(p.x, WATER, 20 + a * 70 + q * 18, 6 + a * 12, 0, 0, 6.2832); g.stroke(); } }
+      else plane(p.x, p.y, Math.atan2(p.vy, p.vx) * 0.7);
+      g.save(); g.shadowColor = "#f2bd45"; g.shadowBlur = 16; g.fillStyle = "#fff0d1"; g.font = "800 54px 'Unbounded',sans-serif"; g.textAlign = "left"; g.textBaseline = "top"; g.fillText("×" + p.mult.toFixed(2), 24, 20); g.restore();
+    } else {
+      plane(100, 622, -0.15 + Math.sin(T * 3) * 0.03);
+    }
+    g.restore();
+  }
+  function idle() { if (run) return; draw(0); idleT = requestAnimationFrame(idle); }
+  idle();
+
+  go.addEventListener("click", () => {
+    if (st.lock) return;
+    if (go.dataset.broke) { loan(go, "Взлёт"); return; }
+    const bet = Math.min(st.bet, gBest.chips); setChips(-bet); st.lock = true; go.disabled = true;
+    cancelAnimationFrame(idleT);
+    const r = plan(); r.hitAt = {}; r.hits.forEach(h => { r.hitAt[h.j] = h.i; }); run = r;
+    msg.className = "cz-msg"; msg.textContent = "Взлёт! Лови иксы…";
+    const t0 = performance.now(); let f = 0, ended = false;
+    const loop = () => {
+      f = Math.floor((performance.now() - t0) / 1000 * 60 * 1.1);
+      draw(f);
+      if (!ended && f >= r.pts.length - 1) {
+        ended = true;
+        const pay = r.win ? Math.floor(bet * r.mult) : 0;
+        if (pay) setChips(pay); else gScore.textContent = "💿 " + gBest.chips;
+        msg.className = "cz-msg" + (pay > bet ? " win" : "");
+        msg.textContent = r.win ? "Посадка на палубу! ×" + r.mult.toFixed(2) + " → " + (pay - bet >= 0 ? "+" : "") + (pay - bet) + " 💿" : "Упал в воду. Ставка " + bet + " 💿 сгорела";
+        st.lock = false; go.disabled = false; brokeCheck(go, "Взлёт"); bestLabel();
+      }
+      if (f < r.pts.length + 70) raf = requestAnimationFrame(loop);
+      else { run = null; idle(); }
+    };
+    raf = requestAnimationFrame(loop);
+  });
+  gCleanup = () => { cancelAnimationFrame(raf); cancelAnimationFrame(idleT); run = null; };
+};
 
 // ── УГАДАЙ ПЕСНЮ ──
 GAMES.guess = function () {
